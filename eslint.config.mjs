@@ -19,7 +19,7 @@ export default defineConfig([
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-vars': 'off',
       'prettier/prettier': [
-        'erro',
+        'warn',
         {
           arrowParens: 'always',
           semi: false,
