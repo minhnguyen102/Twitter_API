@@ -24,7 +24,7 @@ export const validateRegister = validate(
           max: 100
         }
       },
-      trim: true
+      trim: true,
     },
     email: {
       notEmpty: true,
@@ -38,7 +38,8 @@ export const validateRegister = validate(
         options: {
           min: 8,
           max: 50,
-        }
+        },
+        errorMessage: "Mật khẩu phải từ 8 đến 50 ký tự"
       },
       isStrongPassword: { // ghi đè các trường
         options: {
@@ -46,7 +47,8 @@ export const validateRegister = validate(
           minUppercase: 1,
           minNumbers: 1,
           minSymbols: 1
-        }
+        },
+        errorMessage: 'Mật khẩu phải chứa ít nhất 1 chữ thường, 1 chữ hoa, 1 số và 1 ký tự đặc biệt'
       }
     },
     confirm_password: {
@@ -56,7 +58,8 @@ export const validateRegister = validate(
         options: {
           min: 8,
           max: 50,
-        }
+        },
+        errorMessage: "Mật khẩu phải từ 8 đến 50 ký tự"
       },
       isStrongPassword: { // ghi đè các trường
         options: {
@@ -64,6 +67,15 @@ export const validateRegister = validate(
           minUppercase: 1,
           minNumbers: 1,
           minSymbols: 1
+        },
+        errorMessage: 'Mật khẩu phải chứa ít nhất 1 chữ thường, 1 chữ hoa, 1 số và 1 ký tự đặc biệt'
+      },
+      custom: {
+        options: (value, {req}) => {
+          if(value !== req.body.password){
+            throw new Error("Xác nhận mật khẩu không khớp")
+          }
+          return true;
         }
       }
     },
