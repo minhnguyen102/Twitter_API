@@ -1,5 +1,10 @@
 import { Request, Response } from "express";
+import User from "~/models/schemas/User.schema";
+import databaseService from "~/services/database.services";
+import usersServices from "~/services/users.services";
 
+
+// [POST] /users/login
 export const usersLogin = (req: Request, res: Response) => {
   const {email, password} = req.body;
   const db = {
@@ -15,4 +20,24 @@ export const usersLogin = (req: Request, res: Response) => {
       error : "Error"
     })
   }
+}
+
+// [POST] /users/register
+export const usersRegister = async (req: Request, res: Response) => {
+  const {email, password} = req.body;
+  
+  try {
+    const  user = await usersServices.regiter({email, password});
+    res.json({
+      message : "Success",
+      user : user
+    })
+  } catch (error) {
+    res.status(400).json({
+      error : error,
+      message : "Register Faile"
+    })
+  }
+  
+
 }
