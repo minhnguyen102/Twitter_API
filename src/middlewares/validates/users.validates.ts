@@ -1,5 +1,6 @@
 import { NextFunction, Response, Request } from "express";
 import { checkSchema } from "express-validator";
+import usersServices from "~/services/users.services";
 import { validate } from "~/utils/validation";
 
 export const validateLogin = (req: Request, res : Response, next : NextFunction) => {
@@ -29,7 +30,16 @@ export const validateRegister = validate(
     email: {
       notEmpty: true,
       trim: true,
-      isEmail: true
+      isEmail: true,
+      custom: {
+        options: async (value) => {
+          const isExitEmail = await usersServices.checkEmailExit(value); // value = req.body.email
+          if(isExitEmail){
+            throw Error("Email đã tồn tại. Vui lòng tạo mới bằng email khác")
+          }
+          return true;
+        }
+      }
     },
     password: {
       notEmpty: true,

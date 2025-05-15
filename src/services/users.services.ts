@@ -11,6 +11,11 @@ class UsersServices {
 
     return user;
   }
+
+  async checkEmailExit(email: string){
+    const emailExit = await databaseService.users.findOne({email});
+    return Boolean(emailExit); // trả về true nếu email đã tồn tại
+  }
 }
 
 const usersServices = new UsersServices;
