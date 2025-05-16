@@ -1,12 +1,14 @@
 import User from "~/models/schemas/User.schema";
 import databaseService from "./database.services";
 import { RegisterReqBody } from "~/models/requests/User.requests";
+import { hashPassword } from "~/utils/crypto";
 
 class UsersServices {
   async regiter(payload: RegisterReqBody){
     const user = await databaseService.users.insertOne(new User({
       ...payload,
-      date_od_birth: new Date(payload.date_of_birth)
+      date_od_birth: new Date(payload.date_of_birth),
+      password: hashPassword(payload.password)
       // vì trong interface RegisterReqBody date_of_bỉrth là kiểu string, cần convert lại kiểu Date để hợp với hàm tạo trong class User
     }))
 
