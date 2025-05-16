@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import usersServices from "~/services/users.services";
-import { ParamsDictionary } from 'express-serve-static-core'
+import { NextFunction, ParamsDictionary } from 'express-serve-static-core'
 import { RegisterReqBody } from "~/models/requests/User.requests";
+import { error } from "console";
 
 // [POST] /users/login
 export const usersLogin = (req: Request, res: Response) => {
@@ -22,17 +23,10 @@ export const usersLogin = (req: Request, res: Response) => {
 }
 
 // [POST] /users/register
-export const usersRegister = async (req: Request<ParamsDictionary, any, RegisterReqBody>, res: Response) => {
-  try {
-    const  user = await usersServices.regiter(req.body);
-    res.json({
-      message : "Success",
-      user : user
-    })
-  } catch (error) {
-    res.status(400).json({
-      error : error,
-      message : "Register Faile"
-    })
-  }
+export const usersRegister = async (req: Request<ParamsDictionary, any, RegisterReqBody>, res: Response, next: NextFunction) => {
+  const  user = await usersServices.regiter(req.body);
+  return res.json({
+    message : "Success",
+    user : user
+  })
 }
