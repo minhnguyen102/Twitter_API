@@ -8,10 +8,10 @@ enum UserVerifyStatus {
 
 interface UserType{
   _id?: ObjectId,
-  name?: string,
+  name: string,
   email: string,
   password: string,
-  date_od_birth?: Date,
+  date_od_birth: Date,
   created_at?: Date,
   updated_at?: Date,
   email_verify_token?: string, //jwt hoặc '' nếu đã xác thực email

@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
-import User from "~/models/schemas/User.schema";
-import databaseService from "~/services/database.services";
 import usersServices from "~/services/users.services";
-
+import { ParamsDictionary } from 'express-serve-static-core'
+import { RegisterReqBody } from "~/models/requests/User.requests";
 
 // [POST] /users/login
 export const usersLogin = (req: Request, res: Response) => {
@@ -23,11 +22,9 @@ export const usersLogin = (req: Request, res: Response) => {
 }
 
 // [POST] /users/register
-export const usersRegister = async (req: Request, res: Response) => {
-  const {email, password} = req.body;
-  
+export const usersRegister = async (req: Request<ParamsDictionary, any, RegisterReqBody>, res: Response) => {
   try {
-    const  user = await usersServices.regiter({email, password});
+    const  user = await usersServices.regiter(req.body);
     res.json({
       message : "Success",
       user : user
@@ -38,6 +35,4 @@ export const usersRegister = async (req: Request, res: Response) => {
       message : "Register Faile"
     })
   }
-  
-
 }
