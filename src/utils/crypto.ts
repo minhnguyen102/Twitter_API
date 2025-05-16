@@ -7,7 +7,7 @@ function sha256(content: string) {
 }
 
 export function hashPassword(password: string): string {
-  const hash_secret = process.env.HASH_SECRET as string
+  const hash_secret = process.env.PASSWORD_SECRET as string
   return sha256(password + hash_secret)
 }
 

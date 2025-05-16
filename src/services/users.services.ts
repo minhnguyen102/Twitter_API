@@ -2,8 +2,35 @@ import User from "~/models/schemas/User.schema";
 import databaseService from "./database.services";
 import { RegisterReqBody } from "~/models/requests/User.requests";
 import { hashPassword } from "~/utils/crypto";
+import { signToken } from "~/utils/jwt";
+import { TokenType } from "~/constants/enums";
+
 
 class UsersServices {
+  private signAccessToken(user_id: string){
+    return signToken({
+      payload: {
+        user_id,
+        type: TokenType.AccessToken
+      },
+      options: {
+        expiresIn: '15m'
+      }
+    })
+  }
+  private signRefreshToken(user_id: string){
+    return signToken({
+      payload: {
+        user_id,
+        type: TokenType.RefreshToken
+      },
+      options: {
+        expiresIn: '100d'
+      }
+    })
+  }
+
+  
   async regiter(payload: RegisterReqBody){
     const user = await databaseService.users.insertOne(new User({
       ...payload,
@@ -12,7 +39,17 @@ class UsersServices {
       // vì trong interface RegisterReqBody date_of_bỉrth là kiểu string, cần convert lại kiểu Date để hợp với hàm tạo trong class User
     }))
 
-    return user;
+    const user_id = user.insertedId.toString();
+    
+    const [accessToken, refreshToken] = await Promise.all(
+      [
+        this.signAccessToken(user_id),
+        this.signRefreshToken(user_id)
+      ])
+    return {
+      accessToken,
+      refreshToken
+    }
   }
 
   async checkEmailExit(email: string){
