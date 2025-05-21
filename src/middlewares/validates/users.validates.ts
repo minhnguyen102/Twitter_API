@@ -1,5 +1,6 @@
 import { NextFunction, Response, Request } from "express";
 import { checkSchema } from "express-validator";
+import { USER_MESSAGE } from "~/constants/messages";
 import { ErrorWithStatus } from "~/models/Errors";
 import usersServices from "~/services/users.services";
 import { validate } from "~/utils/validation";
@@ -18,39 +19,48 @@ export const validateLogin = (req: Request, res : Response, next : NextFunction)
 export const validateRegister = validate(
   checkSchema({
     name: {
-      notEmpty: true,
+      notEmpty: {
+        errorMessage: USER_MESSAGE.NAME.REQUIRED
+      },
       isString: true,
       isLength: {
         options: {
           min: 1,
           max: 100
-        }
+        },
+        errorMessage: USER_MESSAGE.NAME.INVALID
       },
       trim: true,
     },
     email: {
-      notEmpty: true,
+      notEmpty: {
+        errorMessage: USER_MESSAGE.EMAIL.REQUIRED
+      },
       trim: true,
-      isEmail: true,
+      isEmail: {
+        errorMessage: USER_MESSAGE.EMAIL.INVALID
+      },
       custom: {
         options: async (value) => {
           const isExitEmail = await usersServices.checkEmailExit(value); // value = req.body.email
           if(isExitEmail){
-            throw new Error("Email đã tồn tại!")
+            throw new Error(USER_MESSAGE.EMAIL.EXISTS)
           }
           return true;
         }
       }
     },
     password: {
-      notEmpty: true,
+      notEmpty: {
+        errorMessage: USER_MESSAGE.PASSWORD.REQUIRED
+      },
       isString: true,
       isLength: {
         options: {
           min: 8,
           max: 50,
         },
-        errorMessage: "Mật khẩu phải từ 8 đến 50 ký tự"
+        errorMessage: USER_MESSAGE.PASSWORD.LENGTH
       },
       isStrongPassword: { // ghi đè các trường
         options: {
@@ -59,7 +69,7 @@ export const validateRegister = validate(
           minNumbers: 1,
           minSymbols: 1
         },
-        errorMessage: 'Mật khẩu phải chứa ít nhất 1 chữ thường, 1 chữ hoa, 1 số và 1 ký tự đặc biệt'
+        errorMessage: USER_MESSAGE.PASSWORD.WEAK
       }
     },
     confirm_password: {
@@ -70,7 +80,7 @@ export const validateRegister = validate(
           min: 8,
           max: 50,
         },
-        errorMessage: "Mật khẩu phải từ 8 đến 50 ký tự"
+        errorMessage: USER_MESSAGE.CONFIRM_PASSWORD.LENGTH
       },
       isStrongPassword: { // ghi đè các trường
         options: {
@@ -84,7 +94,7 @@ export const validateRegister = validate(
       custom: {
         options: (value, {req}) => {
           if(value !== req.body.password){
-            throw new Error("Xác nhận mật khẩu không khớp")
+            throw new Error(USER_MESSAGE.CONFIRM_PASSWORD.NOT_MATCH)
           }
           return true;
         }
@@ -94,8 +104,9 @@ export const validateRegister = validate(
       isISO8601: {
         options: {
           strict: true,
-          strictSeparator: true
-        }
+          strictSeparator: true,
+        },
+        errorMessage: USER_MESSAGE.DATE_OF_BIRTH.INVALID
       }
     }
   })
