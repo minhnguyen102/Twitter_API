@@ -1,3 +1,4 @@
+import { defaultErrorHandler } from '~/middlewares/errors.middleware';
 import userRouter from './user.router';
 import { Router, Request, Response, NextFunction } from 'express'
 
@@ -7,10 +8,6 @@ router.use("/users", userRouter);
 
 
 // error handle cho cả app: Luôn phải để sau cùng
-router.use((error: any, req: Request, res: Response, next: NextFunction) =>{
-  res.status(400).json({
-    error : error.message
-  })
-})
+// router.use(defaultErrorHandler)
 
 export default router;

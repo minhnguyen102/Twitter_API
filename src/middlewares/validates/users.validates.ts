@@ -1,5 +1,6 @@
 import { NextFunction, Response, Request } from "express";
 import { checkSchema } from "express-validator";
+import { ErrorWithStatus } from "~/models/Errors";
 import usersServices from "~/services/users.services";
 import { validate } from "~/utils/validation";
 
@@ -35,7 +36,7 @@ export const validateRegister = validate(
         options: async (value) => {
           const isExitEmail = await usersServices.checkEmailExit(value); // value = req.body.email
           if(isExitEmail){
-            throw Error("Email đã tồn tại. Vui lòng tạo mới bằng email khác")
+            throw new Error("Email đã tồn tại!")
           }
           return true;
         }

@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import usersServices from "~/services/users.services";
 import { NextFunction, ParamsDictionary } from 'express-serve-static-core'
 import { RegisterReqBody } from "~/models/requests/User.requests";
-import { error } from "console";
 
 // [POST] /users/login
 export const usersLogin = (req: Request, res: Response) => {
