@@ -1,6 +1,7 @@
 import  { Collection, Db, MongoClient } from 'mongodb';
 import dotenv from 'dotenv'
 import User from '~/models/schemas/User.schema';
+import RefreshToken from '~/models/schemas/RefreshToken.schema';
 dotenv.config()
 
 const uri = `mongodb+srv://${process.env.USER_NAME}:${process.env.PASSWORD}@cluster0.sqjfe.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -27,6 +28,11 @@ class DatabaseService {
   // Lấy ra Collection User
   get users(): Collection<User>{
     return this.db.collection(process.env.DB_USERS_COLLECTION as string); // fix lỗi string or undefined
+  }
+
+  // lấy ra Collections RefreshToken
+  get refreshTokens(): Collection<RefreshToken>{
+    return this.db.collection(process.env.DB_REFRESH_TOKENS_COLLECTION as string)
   }
 }
 

@@ -4,6 +4,8 @@ import { RegisterReqBody } from "~/models/requests/User.requests";
 import { hashPassword } from "~/utils/crypto";
 import { signToken } from "~/utils/jwt";
 import { TokenType } from "~/constants/enums";
+import { ObjectId } from "mongodb";
+import RefreshToken from "~/models/schemas/RefreshToken.schema";
 
 
 class UsersServices {
@@ -48,8 +50,8 @@ class UsersServices {
     }))
 
     const user_id = user.insertedId.toString();
-    
     const [accessToken, refreshToken] = await this.signAccessTokenAndRefreshToken(user_id)
+    await databaseService.refreshTokens.insertOne(new RefreshToken({token: refreshToken, user_id: new ObjectId(user_id)}))
     return {
       accessToken,
       refreshToken
@@ -65,6 +67,8 @@ class UsersServices {
   // Login
   async login(user_id: string){
     const [accessToken, refreshToken] = await this.signAccessTokenAndRefreshToken(user_id);
+    // refreshTokens
+    await databaseService.refreshTokens.insertOne(new RefreshToken({token: refreshToken, user_id: new ObjectId(user_id)}))
     return {
       accessToken,
       refreshToken

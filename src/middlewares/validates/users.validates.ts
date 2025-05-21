@@ -4,6 +4,7 @@ import { USER_MESSAGE } from "~/constants/messages";
 import { ErrorWithStatus } from "~/models/Errors";
 import databaseService from "~/services/database.services";
 import usersServices from "~/services/users.services";
+import { hashPassword } from "~/utils/crypto";
 import { validate } from "~/utils/validation";
 
 export const validateLogin = validate(
@@ -18,7 +19,7 @@ export const validateLogin = validate(
       },
       custom: {
         options: async (value, {req}) => {
-          const user = await databaseService.users.findOne({email: value}); // value = req.body.email
+          const user = await databaseService.users.findOne({email: value, password: hashPassword(req.body.password)}); // value = req.body.email
           if(!user){
             throw new Error(USER_MESSAGE.USER_NOT_FOUND)
           }
@@ -39,15 +40,6 @@ export const validateLogin = validate(
         },
         errorMessage: USER_MESSAGE.PASSWORD.LENGTH
       },
-      isStrongPassword: { // ghi đè các trường
-        options: {
-          minLowercase: 1,
-          minUppercase: 1,
-          minNumbers: 1,
-          minSymbols: 1
-        },
-        errorMessage: USER_MESSAGE.PASSWORD.WEAK
-      }
     }
   })
 )
