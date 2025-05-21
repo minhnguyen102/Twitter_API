@@ -2,19 +2,55 @@ import { NextFunction, Response, Request } from "express";
 import { checkSchema } from "express-validator";
 import { USER_MESSAGE } from "~/constants/messages";
 import { ErrorWithStatus } from "~/models/Errors";
+import databaseService from "~/services/database.services";
 import usersServices from "~/services/users.services";
 import { validate } from "~/utils/validation";
 
-export const validateLogin = (req: Request, res : Response, next : NextFunction) => {
-  const {email, password} = req.body;
-  if(!email || !password){
-    res.status(400).json({
-      error : "Missing email or password"
-    })
-    return;
-  }
-  next();
-}
+export const validateLogin = validate(
+  checkSchema({
+    email: {
+      notEmpty: {
+        errorMessage: USER_MESSAGE.EMAIL.REQUIRED
+      },
+      trim: true,
+      isEmail: {
+        errorMessage: USER_MESSAGE.EMAIL.INVALID
+      },
+      custom: {
+        options: async (value, {req}) => {
+          const user = await databaseService.users.findOne({email: value}); // value = req.body.email
+          if(!user){
+            throw new Error(USER_MESSAGE.USER_NOT_FOUND)
+          }
+          req.user = user
+          return true;
+        }
+      }
+    },
+    password: {
+      notEmpty: {
+        errorMessage: USER_MESSAGE.PASSWORD.REQUIRED
+      },
+      isString: true,
+      isLength: {
+        options: {
+          min: 8,
+          max: 50,
+        },
+        errorMessage: USER_MESSAGE.PASSWORD.LENGTH
+      },
+      isStrongPassword: { // ghi đè các trường
+        options: {
+          minLowercase: 1,
+          minUppercase: 1,
+          minNumbers: 1,
+          minSymbols: 1
+        },
+        errorMessage: USER_MESSAGE.PASSWORD.WEAK
+      }
+    }
+  })
+)
 
 export const validateRegister = validate(
   checkSchema({

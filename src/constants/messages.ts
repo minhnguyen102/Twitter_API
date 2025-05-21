@@ -1,5 +1,6 @@
 export const USER_MESSAGE = {
   VALIDATION_ERROR : 'validation_error',
+  USER_NOT_FOUND: "User not found",
   NAME: {
     REQUIRED: 'Tên không được để trống',
     INVALID: 'Tên phải là chuỗi từ 1 đến 100 ký tự'
@@ -23,4 +24,6 @@ export const USER_MESSAGE = {
   DATE_OF_BIRTH: {
     INVALID: 'Ngày sinh không đúng định dạng IOS8601'
   },
+  LOGIN_SUCCESS: "Login success",
+  REGISTER_SUCCESS : "Register success"
 } as const

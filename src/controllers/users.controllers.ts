@@ -2,30 +2,28 @@ import { Request, Response } from "express";
 import usersServices from "~/services/users.services";
 import { NextFunction, ParamsDictionary } from 'express-serve-static-core'
 import { RegisterReqBody } from "~/models/requests/User.requests";
+import User from "~/models/schemas/User.schema";
+import { ObjectId } from "mongodb";
+import { USER_MESSAGE } from "~/constants/messages";
 
 // [POST] /users/login
-export const usersLogin = (req: Request, res: Response) => {
-  const {email, password} = req.body;
-  const db = {
-    email : "minhkhac1002@gmail.com",
-    password : "123456"
-  }
-  if(email === db.email && password === db.password){
-    res.status(200).json({
-      message : "Login success"
-    })
-  }else{
-    res.status(400).json({
-      error : "Error"
-    })
-  }
+export const usersLogin = async (req: Request, res: Response) => {
+  const user = req.user as User
+  const user_id = user._id as ObjectId
+  const results = await usersServices.login(user_id.toString())
+  const {accessToken, refreshToken} = results
+  return res.json({
+    message: USER_MESSAGE.LOGIN_SUCCESS,
+    accessToken,
+    refreshToken
+  })
 }
 
 // [POST] /users/register
 export const usersRegister = async (req: Request<ParamsDictionary, any, RegisterReqBody>, res: Response, next: NextFunction) => {
   const  user = await usersServices.regiter(req.body);
   return res.json({
-    message : "Success",
+    message : USER_MESSAGE.REGISTER_SUCCESS,
     user : user
   })
 }

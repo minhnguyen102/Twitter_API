@@ -30,7 +30,15 @@ class UsersServices {
     })
   }
 
-  
+  private signAccessTokenAndRefreshToken(user_id: string){
+    return Promise.all(
+      [
+        this.signAccessToken(user_id),
+        this.signRefreshToken(user_id)
+      ])
+  }
+
+  // Register
   async regiter(payload: RegisterReqBody){
     const user = await databaseService.users.insertOne(new User({
       ...payload,
@@ -41,20 +49,26 @@ class UsersServices {
 
     const user_id = user.insertedId.toString();
     
-    const [accessToken, refreshToken] = await Promise.all(
-      [
-        this.signAccessToken(user_id),
-        this.signRefreshToken(user_id)
-      ])
+    const [accessToken, refreshToken] = await this.signAccessTokenAndRefreshToken(user_id)
     return {
       accessToken,
       refreshToken
     }
   }
 
+  // checkEmailExit
   async checkEmailExit(email: string){
     const emailExit = await databaseService.users.findOne({email});
     return Boolean(emailExit); // trả về true nếu email đã tồn tại
+  }
+
+  // Login
+  async login(user_id: string){
+    const [accessToken, refreshToken] = await this.signAccessTokenAndRefreshToken(user_id);
+    return {
+      accessToken,
+      refreshToken
+    }
   }
 }
 
