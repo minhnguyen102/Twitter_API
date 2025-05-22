@@ -7,6 +7,7 @@ export const USER_MESSAGE = {
   REFRESH_TOKEN_IS_REQUIRED: "C required",
   REFRESH_TOKEN_IS_INVALID: "Refresh token is invalid",
   USED_REFRESH_TOKEN_OR_NOT_EXIT: "used refresh token or not exit",
+  LOGOUT_SUCCESS: "Logout Successfully",
   NAME: {
     REQUIRED: 'Tên không được để trống',
     INVALID: 'Tên phải là chuỗi từ 1 đến 100 ký tự'

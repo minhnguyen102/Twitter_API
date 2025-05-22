@@ -1,7 +1,6 @@
-import { error } from 'console'
 import jwt, { SignOptions } from 'jsonwebtoken'
-import { reject } from 'lodash'
-import { resolve } from 'path'
+import { TokenPayload } from '~/models/requests/User.requests'
+
 
 export const signToken = ({payload, privateKey = process.env.JWT_SECRET as string, options= {algorithm: 'HS256'}}:
   {
@@ -19,13 +18,15 @@ export const signToken = ({payload, privateKey = process.env.JWT_SECRET as strin
     })
   })
 }
+
+
 export const verifyToken = ({ token, secretOrPublicKey = process.env.JWT_SECRET as string}: {token: string, secretOrPublicKey?: string}) =>{
-  return new Promise<jwt.JwtPayload>((resolve, reject) => {
+  return new Promise<TokenPayload>((resolve, reject) => {
     jwt.verify(token, secretOrPublicKey, (error, decode) => {
       if(error){
         throw reject(error)
       }
-      resolve(decode as jwt.JwtPayload)
+      resolve(decode as TokenPayload)
     })
   })
 }

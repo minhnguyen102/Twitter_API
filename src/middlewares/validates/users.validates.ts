@@ -1,5 +1,6 @@
 import { NextFunction, Response, Request } from "express";
 import { checkSchema, header } from "express-validator";
+import { JsonWebTokenError } from "jsonwebtoken";
 import httpStatus from "~/constants/httpStatus";
 import { USER_MESSAGE } from "~/constants/messages";
 import { ErrorWithStatus } from "~/models/Errors";
@@ -155,8 +156,16 @@ export const validateAccesstToken = validate(
             throw new ErrorWithStatus({message: USER_MESSAGE.ACCESS_TOKEN_IS_REQUIRED, status: httpStatus.UNAUTHORIZED}) // tương đương với việc trả về Promise.reject
           }
           // giải mã access_token => lấy user_Id;
-          const decoded_authorization = await verifyToken({token : accessToken})
-          req.decoded_authorization = decoded_authorization
+          try {
+            const decoded_authorization = await verifyToken({token : accessToken})
+            ;(req as Request).decoded_authorization = decoded_authorization // mục đích là để cho decoded_authorization không phải kiểu any
+            // req.decoded_authorization = decoded_authorization 
+          } catch (error) {
+            return new ErrorWithStatus({
+              message: (error as JsonWebTokenError).message,
+              status: httpStatus.UNAUTHORIZED
+            })
+          }
           return true
         }
       }
@@ -173,13 +182,26 @@ export const validateRefreshToken = validate(
       custom: {
         options: async (value, {req}) => {
           try {
-            const [decode_refresh_token, refresh_token] = await Promise.all([verifyToken({token: value}), databaseService.refreshTokens.findOne({token: value})])
-            if(!refresh_token){
-              throw new ErrorWithStatus({message: USER_MESSAGE.USED_REFRESH_TOKEN_OR_NOT_EXIT, status: httpStatus.UNAUTHORIZED})
+            const [decoded_refresh_token, refresh_token] = await Promise.all([
+              verifyToken({token: value}), 
+              databaseService.refreshTokens.findOne({token: value})
+            ])
+            if(refresh_token === null){
+              throw new ErrorWithStatus({
+                message: USER_MESSAGE.USED_REFRESH_TOKEN_OR_NOT_EXIT, 
+                status: httpStatus.UNAUTHORIZED
+              })
             }
-            req.decode_refresh_token = decode_refresh_token
+            ;(req as Request).decoded_refresh_token = decoded_refresh_token;
+            // req.decoded_refresh_token = decoded_refresh_token
           } catch (error) {
-            throw new ErrorWithStatus({message: USER_MESSAGE.REFRESH_TOKEN_IS_INVALID, status: httpStatus.UNAUTHORIZED}) // refresh_token đã hết hạn hoặc sai
+            if(error instanceof JsonWebTokenError){
+              throw new ErrorWithStatus({
+                message: USER_MESSAGE.REFRESH_TOKEN_IS_INVALID, 
+                status: httpStatus.UNAUTHORIZED
+              }) // refresh_token đã hết hạn hoặc sai
+            }
+            throw error
           }
           return true
         }
