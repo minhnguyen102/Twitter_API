@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { verifyEmailController, userLogout, usersLogin, usersRegister, resendVerifyEmailController } from '~/controllers/users.controllers';
-import { validateLogin, validateAccesstToken, validateRegister, validateRefreshToken, validateEmailVerifyToken } from '~/middlewares/validates/users.validates';
+import { verifyEmailController, userLogout, usersLogin, usersRegister, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController } from '~/controllers/users.controllers';
+import { validateLogin, validateAccesstToken, validateRegister, validateRefreshToken, validateEmailVerifyToken, validateForgotPassword, validateForgotPasswordToken } from '~/middlewares/validates/users.validates';
 import { wrapReqHandler } from '~/utils/handles';
 
 const usersRouter = Router()
@@ -33,5 +33,21 @@ usersRouter.post("/verify-email", validateEmailVerifyToken, wrapReqHandler(verif
  * Yêu cầu đăng nhập rồi mới được resend
  */
 usersRouter.post("/resend-verify-email", validateAccesstToken, wrapReqHandler(resendVerifyEmailController))
+
+/*
+ * Description:  forgot-password
+ * Path: /users/forgot-password
+ * Method: POST
+ * Body: {email: string}
+ */
+usersRouter.post("/forgot-password", validateForgotPassword, wrapReqHandler(forgotPasswordController))
+
+/*
+ * Description:  verify-forgot-password
+ * Path: /users/verify-forgot-password
+ * Method: POST
+ * Body: {forgot_password_token: string}
+ */
+usersRouter.post("/verify-forgot-password", validateForgotPasswordToken, wrapReqHandler(verifyForgotPasswordController))
 
 export default usersRouter;
