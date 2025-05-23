@@ -16,6 +16,7 @@ class UsersServices {
         user_id,
         type: TokenType.AccessToken
       },
+      privateKey: process.env.JWT_SECRET_ACCESS_TOKEN as string,
       options: {
         expiresIn: '15m'
       }
@@ -27,6 +28,7 @@ class UsersServices {
         user_id,
         type: TokenType.RefreshToken
       },
+      privateKey: process.env.JWT_SECRET_REFRESH_TOKEN as string,
       options: {
         expiresIn: '100d'
       }

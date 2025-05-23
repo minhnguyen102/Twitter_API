@@ -1,4 +1,4 @@
-import { Router, Request, Response, NextFunction } from 'express'
+import { Router } from 'express'
 import { userLogout, usersLogin, usersRegister } from '~/controllers/users.controllers';
 import { validateLogin, validateAccesstToken, validateRegister, validateRefreshToken } from '~/middlewares/validates/users.validates';
 import { wrapReqHandler } from '~/utils/handles';

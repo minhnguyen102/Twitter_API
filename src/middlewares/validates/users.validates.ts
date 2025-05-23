@@ -149,15 +149,15 @@ export const validateAccesstToken = validate(
       notEmpty: {
         errorMessage: USER_MESSAGE.ACCESS_TOKEN_IS_REQUIRED
       },
-      custom: {
+      custom: { // Kiểm tra tính hợp lệ của access_token + verify
         options: async (value: string, {req}) => {
           const accessToken = value.split(" ")[1]
           if(!accessToken){
             throw new ErrorWithStatus({message: USER_MESSAGE.ACCESS_TOKEN_IS_REQUIRED, status: httpStatus.UNAUTHORIZED}) // tương đương với việc trả về Promise.reject
           }
-          // giải mã access_token => lấy user_Id;
           try {
-            const decoded_authorization = await verifyToken({token : accessToken})
+            const decoded_authorization = await verifyToken({token : accessToken, secretOrPublicKey: process.env.JWT_SECRET_ACCESS_TOKEN as string})
+            console.log(decoded_authorization);
             ;(req as Request).decoded_authorization = decoded_authorization // mục đích là để cho decoded_authorization không phải kiểu any
             // req.decoded_authorization = decoded_authorization 
           } catch (error) {
@@ -179,11 +179,11 @@ export const validateRefreshToken = validate(
       notEmpty: {
         errorMessage: USER_MESSAGE.REFRESH_TOKEN_IS_REQUIRED
       },
-      custom: {
+      custom: { // verify + decoded refresh_token
         options: async (value, {req}) => {
           try {
             const [decoded_refresh_token, refresh_token] = await Promise.all([
-              verifyToken({token: value}), 
+              verifyToken({token: value, secretOrPublicKey: process.env.JWT_SECRET_REFRESH_TOKEN as string}), 
               databaseService.refreshTokens.findOne({token: value})
             ])
             if(refresh_token === null){

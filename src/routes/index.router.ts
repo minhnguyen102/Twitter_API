@@ -6,8 +6,4 @@ const router = Router()
 
 router.use("/users", userRouter);
 
-
-// error handle cho cả app: Luôn phải để sau cùng
-// router.use(defaultErrorHandler)
-
 export default router;
