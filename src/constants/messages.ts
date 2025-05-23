@@ -4,10 +4,13 @@ export const USER_MESSAGE = {
   LOGIN_SUCCESS: "Login success",
   REGISTER_SUCCESS : "Register success",
   ACCESS_TOKEN_IS_REQUIRED: "Access token is required",
-  REFRESH_TOKEN_IS_REQUIRED: "C required",
+  REFRESH_TOKEN_IS_REQUIRED: "Refresh token is required",
+  EMAIL_VERIFY_TOKEN_IS_REQUIRED: "Email verify token is required",
   REFRESH_TOKEN_IS_INVALID: "Refresh token is invalid",
-  USED_REFRESH_TOKEN_OR_NOT_EXIT: "used refresh token or not exit",
+  USED_REFRESH_TOKEN_OR_NOT_EXIT: "Used refresh token or not exit",
+  EMAIL_ALREADY_VERIFIED_BEFORE: "Email already verify before",
   LOGOUT_SUCCESS: "Logout Successfully",
+  VERIFY_EMAIL_SUCCESS: "Verify email success",
   NAME: {
     REQUIRED: 'Tên không được để trống',
     INVALID: 'Tên phải là chuỗi từ 1 đến 100 ký tự'

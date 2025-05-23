@@ -1,6 +1,7 @@
 import { NextFunction, Response, Request } from "express";
 import { checkSchema, header } from "express-validator";
 import { JsonWebTokenError } from "jsonwebtoken";
+import { capitalize } from "lodash";
 import httpStatus from "~/constants/httpStatus";
 import { USER_MESSAGE } from "~/constants/messages";
 import { ErrorWithStatus } from "~/models/Errors";
@@ -146,18 +147,22 @@ export const validateRegister = validate(
 export const validateAccesstToken = validate(
   checkSchema({
     authorization: {
-      notEmpty: {
-        errorMessage: USER_MESSAGE.ACCESS_TOKEN_IS_REQUIRED
-      },
+      trim: true,
       custom: { // Kiểm tra tính hợp lệ của access_token + verify
         options: async (value: string, {req}) => {
-          const accessToken = value.split(" ")[1]
+          if(!value){
+            throw new ErrorWithStatus({
+              message:  USER_MESSAGE.ACCESS_TOKEN_IS_REQUIRED,
+              status: httpStatus.UNAUTHORIZED
+            })
+          }
+          const accessToken = (value || '').split(" ")[1]
           if(!accessToken){
             throw new ErrorWithStatus({message: USER_MESSAGE.ACCESS_TOKEN_IS_REQUIRED, status: httpStatus.UNAUTHORIZED}) // tương đương với việc trả về Promise.reject
           }
           try {
             const decoded_authorization = await verifyToken({token : accessToken, secretOrPublicKey: process.env.JWT_SECRET_ACCESS_TOKEN as string})
-            console.log(decoded_authorization);
+            // console.log(decoded_authorization);
             ;(req as Request).decoded_authorization = decoded_authorization // mục đích là để cho decoded_authorization không phải kiểu any
             // req.decoded_authorization = decoded_authorization 
           } catch (error) {
@@ -176,11 +181,15 @@ export const validateAccesstToken = validate(
 export const validateRefreshToken = validate(
   checkSchema({
     refresh_token: {
-      notEmpty: {
-        errorMessage: USER_MESSAGE.REFRESH_TOKEN_IS_REQUIRED
-      },
+      trim: true,
       custom: { // verify + decoded refresh_token
         options: async (value, {req}) => {
+          if(!value){
+            throw new ErrorWithStatus({
+              message:  USER_MESSAGE.REFRESH_TOKEN_IS_REQUIRED,
+              status: httpStatus.UNAUTHORIZED
+            })
+          }
           try {
             const [decoded_refresh_token, refresh_token] = await Promise.all([
               verifyToken({token: value, secretOrPublicKey: process.env.JWT_SECRET_REFRESH_TOKEN as string}), 
@@ -203,6 +212,36 @@ export const validateRefreshToken = validate(
             }
             throw error
           }
+          return true
+        }
+      }
+    }
+  },['body'])
+)
+
+export const validateEmailVerifyToken = validate(
+  checkSchema({
+    email_verify_token: {
+      trim: true,
+      custom: { 
+        options: async (value, {req}) => {
+          if(!value){
+            throw new ErrorWithStatus({
+              message:  USER_MESSAGE.EMAIL_VERIFY_TOKEN_IS_REQUIRED,
+              status: httpStatus.UNAUTHORIZED
+            })
+          }
+          try {
+            const decoded_email_verify_token = await verifyToken({token: value, secretOrPublicKey: process.env.JWT_SECRET_EMAIL_VERIFY_TOKEN as string})              
+            // console.log(decoded_email_verify_token);
+            ;(req as Request).decoded_email_verify_token = decoded_email_verify_token            
+          } catch (error) {
+            throw new ErrorWithStatus({
+              message: capitalize((error as JsonWebTokenError).message),
+              status: httpStatus.UNAUTHORIZED
+            })
+          }
+
           return true
         }
       }

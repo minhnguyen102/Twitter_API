@@ -3,10 +3,9 @@ import databaseService from "./database.services";
 import { RegisterReqBody } from "~/models/requests/User.requests";
 import { hashPassword } from "~/utils/crypto";
 import { signToken } from "~/utils/jwt";
-import { TokenType } from "~/constants/enums";
+import { TokenType, UserVerifyStatus } from "~/constants/enums";
 import { ObjectId } from "mongodb";
 import RefreshToken from "~/models/schemas/RefreshToken.schema";
-import { USER_MESSAGE } from "~/constants/messages";
 
 
 class UsersServices {
@@ -35,6 +34,19 @@ class UsersServices {
     })
   }
 
+  private signEmailVerifyToken(user_id: string){
+    return signToken({
+      payload: {
+        user_id,
+        type: TokenType.EmailVerifyToken
+      },
+      privateKey: process.env.JWT_SECRET_EMAIL_VERIFY_TOKEN as string,
+      options: {
+        expiresIn: '7d'
+      }
+    })
+  }
+
   private signAccessTokenAndRefreshToken(user_id: string){
     return Promise.all(
       [
@@ -45,19 +57,24 @@ class UsersServices {
 
   // Register
   async regiter(payload: RegisterReqBody){
-    const user = await databaseService.users.insertOne(new User({
+    const user_id = new ObjectId();
+    const email_verify_token = await this.signEmailVerifyToken(user_id.toString())
+    await databaseService.users.insertOne(new User({
       ...payload,
+      _id: user_id,
+      email_verify_token: email_verify_token,
       date_od_birth: new Date(payload.date_of_birth),
       password: hashPassword(payload.password)
       // vì trong interface RegisterReqBody date_of_bỉrth là kiểu string, cần convert lại kiểu Date để hợp với hàm tạo trong class User
     }))
 
-    const user_id = user.insertedId.toString();
-    const [accessToken, refreshToken] = await this.signAccessTokenAndRefreshToken(user_id)
+    const [accessToken, refreshToken] = await this.signAccessTokenAndRefreshToken(user_id.toString())
     await databaseService.refreshTokens.insertOne(new RefreshToken({token: refreshToken, user_id: new ObjectId(user_id)}))
+    console.log("email_verify_token: ", email_verify_token);
     return {
       accessToken,
-      refreshToken
+      refreshToken,
+      email_verify_token
     }
   }
 
@@ -81,6 +98,29 @@ class UsersServices {
   // Logout
   async logout(refresh_token: string){
     return await databaseService.refreshTokens.deleteOne({token: refresh_token})
+  }
+
+  // verifyEmail
+  async verifyEmail(user_id: string){
+    const [token] = await Promise.all([
+        this.signAccessTokenAndRefreshToken(user_id),
+        await databaseService.users.updateOne(
+        {_id: new ObjectId(user_id)},
+        {
+          $set: {
+            email_verify_token: '',
+            verify: UserVerifyStatus.Verified,
+            updated_at: new Date()
+          }
+        }
+      )
+    ])
+    const [access_token, refresh_token] = token;
+
+    return {
+      access_token,
+      refresh_token
+    }
   }
 }
 
