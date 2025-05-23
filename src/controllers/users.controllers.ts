@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
 import usersServices from "~/services/users.services";
 import { NextFunction, ParamsDictionary } from 'express-serve-static-core'
-import { LogoutReqBody, RegisterReqBody, TokenPayload } from "~/models/requests/User.requests";
+import { LoginReqBody, LogoutReqBody, RegisterReqBody, TokenPayload, VerifyEmailReqBody } from "~/models/requests/User.requests";
 import User from "~/models/schemas/User.schema";
-import { Collection, ObjectId } from "mongodb";
+import { ObjectId } from "mongodb";
 import { USER_MESSAGE } from "~/constants/messages";
 import databaseService from "~/services/database.services";
 import httpStatus from "~/constants/httpStatus";
 import { UserVerifyStatus } from "~/constants/enums";
 
 // [POST] /users/login
-export const usersLogin = async (req: Request, res: Response) => {
+export const usersLogin = async (req: Request<ParamsDictionary, any, LoginReqBody>, res: Response) => {
   const user = req.user as User
   const user_id = user._id as ObjectId
   const results = await usersServices.login(user_id.toString())
@@ -41,7 +41,7 @@ export const userLogout = async (req: Request<ParamsDictionary, any, LogoutReqBo
 }
 
 // [POST] /users/verify-email
-export const verifyEmailController = async (req: Request, res: Response, next: NextFunction) => {
+export const verifyEmailController = async (req: Request<ParamsDictionary, any, VerifyEmailReqBody>, res: Response, next: NextFunction) => {
   const { user_id } = req.decoded_email_verify_token as TokenPayload;
   const user = await databaseService.users.findOne({_id: new ObjectId(user_id)});
 
