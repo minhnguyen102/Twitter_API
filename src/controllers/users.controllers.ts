@@ -7,6 +7,7 @@ import { Collection, ObjectId } from "mongodb";
 import { USER_MESSAGE } from "~/constants/messages";
 import databaseService from "~/services/database.services";
 import httpStatus from "~/constants/httpStatus";
+import { UserVerifyStatus } from "~/constants/enums";
 
 // [POST] /users/login
 export const usersLogin = async (req: Request, res: Response) => {
@@ -39,8 +40,8 @@ export const userLogout = async (req: Request<ParamsDictionary, any, LogoutReqBo
   })
 }
 
-// 
-export const emailVerify = async (req: Request, res: Response, next: NextFunction) => {
+// [POST] /users/verify-email
+export const verifyEmailController = async (req: Request, res: Response, next: NextFunction) => {
   const { user_id } = req.decoded_email_verify_token as TokenPayload;
   const user = await databaseService.users.findOne({_id: new ObjectId(user_id)});
 
@@ -61,4 +62,24 @@ export const emailVerify = async (req: Request, res: Response, next: NextFunctio
     message : USER_MESSAGE.VERIFY_EMAIL_SUCCESS,
     result
   })
+}
+
+// [POST] /users/resend-verify-email
+export const resendVerifyEmailController = async (req: Request, res: Response, next: NextFunction) => {
+  const {user_id} = req.decoded_authorization as TokenPayload
+  const user = await databaseService.users.findOne({_id: new ObjectId(user_id)})
+  if(!user){
+    return res.status(httpStatus.NOT_FOUND).json({
+      message: USER_MESSAGE.USER_NOT_FOUND
+    })
+  }
+
+  if(user.verify === UserVerifyStatus.Verified){
+    return res.status(httpStatus.CONFLICT).json({
+      message: USER_MESSAGE.USER_ALREADY_VERIFIED
+    })
+  }
+
+  const result = await usersServices.resendVerifyEmail(user_id);
+  res.json(result);
 }

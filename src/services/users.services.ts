@@ -6,6 +6,7 @@ import { signToken } from "~/utils/jwt";
 import { TokenType, UserVerifyStatus } from "~/constants/enums";
 import { ObjectId } from "mongodb";
 import RefreshToken from "~/models/schemas/RefreshToken.schema";
+import { USER_MESSAGE } from "~/constants/messages";
 
 
 class UsersServices {
@@ -74,7 +75,6 @@ class UsersServices {
     return {
       accessToken,
       refreshToken,
-      email_verify_token
     }
   }
 
@@ -120,6 +120,29 @@ class UsersServices {
     return {
       access_token,
       refresh_token
+    }
+  }
+
+  // resendVerifyEmail
+  async resendVerifyEmail(user_id: string){
+    // Tạo mới token + thay thế token cũ 
+    const email_verify_token = await this.signEmailVerifyToken(user_id);
+    // Giả lập gửi email cho người dùng
+    console.log("Gửi email cho người dùng: ", email_verify_token);
+
+    await databaseService.users.updateOne(
+      {_id: new ObjectId(user_id)},
+      {
+        $set: {
+          email_verify_token
+        },
+        $currentDate:{
+          updated_at: true
+        }
+      }
+    )
+    return {
+      messsage : USER_MESSAGE.RESEND_VERIFY_EMAIL_SUCCESS
     }
   }
 }

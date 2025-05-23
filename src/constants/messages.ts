@@ -11,6 +11,8 @@ export const USER_MESSAGE = {
   EMAIL_ALREADY_VERIFIED_BEFORE: "Email already verify before",
   LOGOUT_SUCCESS: "Logout Successfully",
   VERIFY_EMAIL_SUCCESS: "Verify email success",
+  USER_ALREADY_VERIFIED: "User is already verified.",
+  RESEND_VERIFY_EMAIL_SUCCESS: "Resend verify email success",
   NAME: {
     REQUIRED: 'Tên không được để trống',
     INVALID: 'Tên phải là chuỗi từ 1 đến 100 ký tự'
