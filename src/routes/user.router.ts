@@ -5,7 +5,20 @@ import { wrapReqHandler } from '~/utils/handles';
 
 const usersRouter = Router()
 
+/*
+ * Description: Login
+ * Path: /users/login
+ * Method: POST
+ * Body: {email: string, password: string}
+ */
 usersRouter.post("/login", validateLogin, wrapReqHandler(usersLogin))
+
+/*
+ * Description: Register
+ * Path: /users/register
+ * Method: POST
+ * Body: {email: string, password: string, ,confirm_password: string, date_of_birth: string}
+ */
 usersRouter.post("/register", validateRegister, wrapReqHandler(usersRegister))
 
 /*

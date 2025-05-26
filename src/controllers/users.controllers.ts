@@ -8,6 +8,7 @@ import { USER_MESSAGE } from "~/constants/messages";
 import databaseService from "~/services/database.services";
 import httpStatus from "~/constants/httpStatus";
 import { UserVerifyStatus } from "~/constants/enums";
+import { pick } from "lodash";
 
 // [POST] /users/login
 export const usersLogin = async (req: Request<ParamsDictionary, any, LoginReqBody>, res: Response) => {
@@ -115,8 +116,19 @@ export const getMeController = async (req: Request, res: Response, next: NextFun
 // [GET] /users/me
 export const getMeControllerPatch = async (req: Request<ParamsDictionary, any, UpdateMeReqBody>, res: Response, next: NextFunction) => {
   const {body} = req
+  const allowedFileds: (keyof UpdateMeReqBody)[] = [
+    "name",
+    "date_of_birth",
+    "bio",
+    "location",
+    "website",
+    "username",
+    "avatar",
+    "cover_photo"
+  ]
+  const allow_body = pick(body, allowedFileds)
   const {user_id} = req.decoded_authorization as TokenPayload
-  const user = await usersServices.updateMe(user_id, body)
+  const user = await usersServices.updateMe(user_id, allow_body)
   return res.json({
     message : USER_MESSAGE.UPDATE_ME_SUCCESS,
     result : user

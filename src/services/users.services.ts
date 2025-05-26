@@ -232,13 +232,18 @@ class UsersServices {
       {_id: new ObjectId(user_id)},
       {
         $set: {
-          ...(_payload as UpdateMeReqBody & {date_of_birth: Date})
+          ...(_payload as UpdateMeReqBody & {date_of_birth?: Date})
         },
         $currentDate: {
           updated_at: true
         }
       },{
-        returnDocument: "after"
+        returnDocument: "after",
+        projection: {
+          password: 0,
+          email_verify_token: 0,
+          forgot_password_token: 0
+        }
       }
     )
     // console.log(user)
