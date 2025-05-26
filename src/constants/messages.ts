@@ -17,6 +17,7 @@ export const USER_MESSAGE = {
   FORGOT_PASSWORD_TOKEN_IS_REQUIRED: "Forgot password token is reuquired",
   FORGOT_PASSWORD_TOKEN_IS_INVALID: "Forgot password token is invalid",
   VERIFY_FORGOT_PASSWORD_SUCCESS: "Verify forgot password success",
+  RESET_PASSWORD_SUCCESS: "Reset password success",
   NAME: {
     REQUIRED: 'Tên không được để trống',
     INVALID: 'Tên phải là chuỗi từ 1 đến 100 ký tự'

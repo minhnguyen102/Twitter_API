@@ -174,14 +174,35 @@ class UsersServices {
       }
     )
 
-    // Gửi mail cho người dùng
+    // Gửi mail cho người dùng forgot_password_token
     console.log("Forgot password: ", forgot_password_token)
 
     return {
       message: USER_MESSAGE.CHECK_EMAIL_TO_RESET_PASSWORD
     }
   }
+
+  // reset password
+  async resetPassword(user_id: string, password: string){
+    await databaseService.users.updateOne(
+      {_id: new ObjectId(user_id)},
+      {
+        $set: {
+          forgot_password_token: "",
+          password: hashPassword(password)
+        },
+        $currentDate: {
+          updated_at: true
+        }
+      }
+    )
+    return {
+      message: USER_MESSAGE.RESET_PASSWORD_SUCCESS
+    }
+  }
 }
+
+
 
 const usersServices = new UsersServices;
 export default usersServices

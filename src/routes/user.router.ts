@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { verifyEmailController, userLogout, usersLogin, usersRegister, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController } from '~/controllers/users.controllers';
-import { validateLogin, validateAccesstToken, validateRegister, validateRefreshToken, validateEmailVerifyToken, validateForgotPassword, validateForgotPasswordToken } from '~/middlewares/validates/users.validates';
+import { verifyEmailController, userLogout, usersLogin, usersRegister, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController } from '~/controllers/users.controllers';
+import { validateLogin, validateAccesstToken, validateRegister, validateRefreshToken, validateEmailVerifyToken, validateForgotPassword, validateForgotPasswordToken, validateResetPasswordToken } from '~/middlewares/validates/users.validates';
 import { wrapReqHandler } from '~/utils/handles';
 
 const usersRouter = Router()
@@ -49,5 +49,13 @@ usersRouter.post("/forgot-password", validateForgotPassword, wrapReqHandler(forg
  * Body: {forgot_password_token: string}
  */
 usersRouter.post("/verify-forgot-password", validateForgotPasswordToken, wrapReqHandler(verifyForgotPasswordController))
+
+/*
+ * Description:  reset-password
+ * Path: /users/reset-password
+ * Method: POST
+ * Body: {forgot_password_token: string, password: string}
+ */
+usersRouter.post("/reset-password", validateResetPasswordToken, wrapReqHandler(resetPasswordController))
 
 export default usersRouter;
