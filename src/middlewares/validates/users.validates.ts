@@ -106,8 +106,6 @@ const ForgotPasswordTokenSchema: ParamSchema = {
   }
 }
 
-
-
 export const validateLogin = validate(
   checkSchema({
     email: {

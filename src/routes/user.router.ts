@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { verifyEmailController, userLogout, usersLogin, usersRegister, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController } from '~/controllers/users.controllers';
+import { verifyEmailController, userLogout, usersLogin, usersRegister, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController, getMeController } from '~/controllers/users.controllers';
 import { validateLogin, validateAccesstToken, validateRegister, validateRefreshToken, validateEmailVerifyToken, validateForgotPassword, validateForgotPasswordToken, validateResetPasswordToken } from '~/middlewares/validates/users.validates';
 import { wrapReqHandler } from '~/utils/handles';
 
@@ -29,7 +29,7 @@ usersRouter.post("/verify-email", validateEmailVerifyToken, wrapReqHandler(verif
  * Path: /users/verify-email
  * Method: POST
  * Body: {}
- * Header: Authorization : access_token
+ * Header: {Authorization : Bearer <access_token>}
  * Yêu cầu đăng nhập rồi mới được resend
  */
 usersRouter.post("/resend-verify-email", validateAccesstToken, wrapReqHandler(resendVerifyEmailController))
@@ -57,5 +57,13 @@ usersRouter.post("/verify-forgot-password", validateForgotPasswordToken, wrapReq
  * Body: {forgot_password_token: string, password: string}
  */
 usersRouter.post("/reset-password", validateResetPasswordToken, wrapReqHandler(resetPasswordController))
+
+/*
+ * Description: get my profile
+ * Path: /users/me
+ * Method: GET
+ * Header: {Authorization : Bearer <access_token>}
+ */
+usersRouter.get("/me", validateAccesstToken, wrapReqHandler(getMeController))
 
 export default usersRouter;
