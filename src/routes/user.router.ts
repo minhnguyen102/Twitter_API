@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { verifyEmailController, userLogout, usersLogin, usersRegister, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController, getMeController } from '~/controllers/users.controllers';
-import { validateLogin, validateAccesstToken, validateRegister, validateRefreshToken, validateEmailVerifyToken, validateForgotPassword, validateForgotPasswordToken, validateResetPasswordToken } from '~/middlewares/validates/users.validates';
+import { verifyEmailController, userLogout, usersLogin, usersRegister, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController, getMeController, getMeControllerPatch } from '~/controllers/users.controllers';
+import { validateLogin, validateAccesstToken, validateRegister, validateRefreshToken, validateEmailVerifyToken, validateForgotPassword, validateForgotPasswordToken, validateResetPasswordToken, validatorVerifiedUser, validateUpdateMe } from '~/middlewares/validates/users.validates';
 import { wrapReqHandler } from '~/utils/handles';
 
 const usersRouter = Router()
@@ -65,5 +65,7 @@ usersRouter.post("/reset-password", validateResetPasswordToken, wrapReqHandler(r
  * Header: {Authorization : Bearer <access_token>}
  */
 usersRouter.get("/me", validateAccesstToken, wrapReqHandler(getMeController))
+
+usersRouter.patch("/me", validateAccesstToken, validatorVerifiedUser, validateUpdateMe, wrapReqHandler(getMeControllerPatch))
 
 export default usersRouter;

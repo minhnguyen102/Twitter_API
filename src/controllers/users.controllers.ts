@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import usersServices from "~/services/users.services";
 import { NextFunction, ParamsDictionary } from 'express-serve-static-core'
-import { LoginReqBody, LogoutReqBody, RegisterReqBody, ResetPasswordBody, TokenPayload, VerifyEmailReqBody } from "~/models/requests/User.requests";
+import { LoginReqBody, LogoutReqBody, RegisterReqBody, ResetPasswordBody, TokenPayload, UpdateMeReqBody, VerifyEmailReqBody } from "~/models/requests/User.requests";
 import User from "~/models/schemas/User.schema";
 import { ObjectId } from "mongodb";
 import { USER_MESSAGE } from "~/constants/messages";
@@ -13,7 +13,7 @@ import { UserVerifyStatus } from "~/constants/enums";
 export const usersLogin = async (req: Request<ParamsDictionary, any, LoginReqBody>, res: Response) => {
   const user = req.user as User
   const user_id = user._id as ObjectId
-  const results = await usersServices.login(user_id.toString())
+  const results = await usersServices.login({user_id: user_id.toString(), verify: user.verify})
   const {accessToken, refreshToken} = results
   return res.json({
     message: USER_MESSAGE.LOGIN_SUCCESS,
@@ -86,8 +86,8 @@ export const resendVerifyEmailController = async (req: Request, res: Response, n
 
 // [POST] /users/forgot-password
 export const forgotPasswordController = async (req: Request, res: Response, next: NextFunction) => {
-  const {_id} = req.user as User
-  const  result = await usersServices.forgotPassword((_id as ObjectId).toString())
+  const {_id, verify} = req.user as User
+  const  result = await usersServices.forgotPassword({user_id : (_id as ObjectId).toString(), verify: verify})
   res.json(result)
 }
 
@@ -110,4 +110,15 @@ export const getMeController = async (req: Request, res: Response, next: NextFun
   const { user_id } = req.decoded_authorization as TokenPayload
   const user = await usersServices.getMe(user_id);
   return res.json(user)
+}
+
+// [GET] /users/me
+export const getMeControllerPatch = async (req: Request<ParamsDictionary, any, UpdateMeReqBody>, res: Response, next: NextFunction) => {
+  const {body} = req
+  const {user_id} = req.decoded_authorization as TokenPayload
+  const user = await usersServices.updateMe(user_id, body)
+  return res.json({
+    message : USER_MESSAGE.UPDATE_ME_SUCCESS,
+    result : user
+  })
 }

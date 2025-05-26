@@ -18,9 +18,14 @@ export const USER_MESSAGE = {
   FORGOT_PASSWORD_TOKEN_IS_INVALID: "Forgot password token is invalid",
   VERIFY_FORGOT_PASSWORD_SUCCESS: "Verify forgot password success",
   RESET_PASSWORD_SUCCESS: "Reset password success",
+  USER_NOT_VERIFIED: "User not verified",
+  BIO_MUST_BE_STRING: "Bio must be string",
+  LOCATION_MUST_BE_STRING : "Location must be string",
+  UPDATE_ME_SUCCESS: "Update profile success",
   NAME: {
     REQUIRED: 'Tên không được để trống',
-    INVALID: 'Tên phải là chuỗi từ 1 đến 100 ký tự'
+    INVALID: 'Tên phải là chuỗi từ 1 đến 100 ký tự',
+    STRING: 'Name must be string'
   },
   EMAIL: {
     REQUIRED: 'Email không được để trống',
@@ -40,5 +45,25 @@ export const USER_MESSAGE = {
   },
   DATE_OF_BIRTH: {
     INVALID: 'Ngày sinh không đúng định dạng IOS8601'
+  },
+  BIO: {
+    STRING: "Bio must be string",
+    LENGTH: "Bio length must be from 1 to 100"
+  },
+  LOCATION: {
+    STRING: "Location must be string",
+    LENGTH: "Location length must be from 1 to 100"
+  },
+  WEBSITE: {
+    STRING: "Website must be string",
+    LENGTH: "Website length must be from 1 to 300"
+  },
+  USERNAME: {
+    STRING: "Website must be string",
+    LENGTH: "Website length must be from 1 to 100"
+  },
+  IMAGE: {
+    STRING: "Image must be string",
+    LENGTH: "Image length must be from 1 to 400"
   },
 } as const
