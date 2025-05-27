@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { verifyEmailController, userLogout, usersLogin, usersRegister, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController, getMeController, getMeControllerPatch } from '~/controllers/users.controllers';
-import { validateLogin, validateAccesstToken, validateRegister, validateRefreshToken, validateEmailVerifyToken, validateForgotPassword, validateForgotPasswordToken, validateResetPasswordToken, validatorVerifiedUser, validateUpdateMe } from '~/middlewares/validates/users.validates';
+import { verifyEmailController, userLogout, usersLogin, usersRegister, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController, getMeController, getMeControllerPatch, followControler } from '~/controllers/users.controllers';
+import { validateLogin, validateAccesstToken, validateRegister, validateRefreshToken, validateEmailVerifyToken, validateForgotPassword, validateForgotPasswordToken, validateResetPasswordToken, validatorVerifiedUser, validateUpdateMe, validateFollowed } from '~/middlewares/validates/users.validates';
 import { wrapReqHandler } from '~/utils/handles';
 
 const usersRouter = Router()
@@ -79,6 +79,21 @@ usersRouter.post("/reset-password", validateResetPasswordToken, wrapReqHandler(r
  */
 usersRouter.get("/me", validateAccesstToken, wrapReqHandler(getMeController))
 
+/*
+ * Description: update my profile
+ * Path: /users/me
+ * Method: PATCH
+ * Header: {Authorization : Bearer <access_token>}
+ */
 usersRouter.patch("/me", validateAccesstToken, validatorVerifiedUser, validateUpdateMe, wrapReqHandler(getMeControllerPatch))
+
+/*
+ * Description: follow someone
+ * Path: /users/follow
+ * Method: POST
+ * Header: {Authorization : Bearer <access_token>}
+ * Body: {followed_user_id: string}
+ */
+usersRouter.post("/follow", validateAccesstToken, validatorVerifiedUser, validateFollowed, wrapReqHandler(followControler))
 
 export default usersRouter;

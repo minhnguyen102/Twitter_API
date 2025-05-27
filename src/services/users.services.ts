@@ -8,6 +8,7 @@ import { ObjectId } from "mongodb";
 import RefreshToken from "~/models/schemas/RefreshToken.schema";
 import { USER_MESSAGE } from "~/constants/messages";
 import { after } from "lodash";
+import Follower from "~/models/schemas/Follower.schema";
 
 
 class UsersServices {
@@ -248,6 +249,26 @@ class UsersServices {
     )
     // console.log(user)
     return user
+  }
+
+  async follow(user_id: string, followed_user_id: string){
+    const followed = await databaseService.followers.findOne({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(followed_user_id)
+    })
+
+    if(followed === null){
+      await databaseService.followers.insertOne(new Follower({
+        user_id: new ObjectId(user_id),
+        followed_user_id: new ObjectId(followed_user_id)
+      }))
+      return {
+        message : USER_MESSAGE.FOLLOW_SUCCESS
+      }
+    }
+    return{
+      message : USER_MESSAGE.FOLLOWED_USER
+    }
   }
 }
 

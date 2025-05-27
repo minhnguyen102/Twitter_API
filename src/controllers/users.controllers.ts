@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import usersServices from "~/services/users.services";
 import { NextFunction, ParamsDictionary } from 'express-serve-static-core'
-import { LoginReqBody, LogoutReqBody, RegisterReqBody, ResetPasswordBody, TokenPayload, UpdateMeReqBody, VerifyEmailReqBody } from "~/models/requests/User.requests";
+import { FollowReqBody, LoginReqBody, LogoutReqBody, RegisterReqBody, ResetPasswordBody, TokenPayload, UpdateMeReqBody, VerifyEmailReqBody } from "~/models/requests/User.requests";
 import User from "~/models/schemas/User.schema";
 import { ObjectId } from "mongodb";
 import { USER_MESSAGE } from "~/constants/messages";
@@ -134,3 +134,11 @@ export const getMeControllerPatch = async (req: Request<ParamsDictionary, any, U
     result : user
   })
 }
+
+export const followControler = async (req: Request<ParamsDictionary, any, FollowReqBody>, res: Response, next: NextFunction) => {
+  const {user_id} = req.decoded_authorization as TokenPayload
+  const {followed_user_id} = req.body
+  const result = await usersServices.follow(user_id, followed_user_id)
+  return res.json(result)
+}
+

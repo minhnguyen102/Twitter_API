@@ -22,6 +22,9 @@ export const USER_MESSAGE = {
   BIO_MUST_BE_STRING: "Bio must be string",
   LOCATION_MUST_BE_STRING : "Location must be string",
   UPDATE_ME_SUCCESS: "Update profile success",
+  FOLLOW_SUCCESS: "Follow user success",
+  INVALID_FOLLOWED_USER_ID: "Invalid followed user id",
+  FOLLOWED_USER: "Followed user",
   NAME: {
     REQUIRED: 'Tên không được để trống',
     INVALID: 'Tên phải là chuỗi từ 1 đến 100 ký tự',
