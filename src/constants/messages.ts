@@ -25,6 +25,9 @@ export const USER_MESSAGE = {
   FOLLOW_SUCCESS: "Follow user success",
   INVALID_FOLLOWED_USER_ID: "Invalid followed user id",
   FOLLOWED_USER: "Followed user",
+  UNFOLLOW_SUCCESS: "Unfollow success",
+  OLD_PASSWORD_NOT_MATCH: "Old password not match",
+  CHANGE_PASSWORD_SUCCESS: "Change password success",
   NAME: {
     REQUIRED: 'Tên không được để trống',
     INVALID: 'Tên phải là chuỗi từ 1 đến 100 ký tự',

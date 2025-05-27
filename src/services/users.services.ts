@@ -136,6 +136,7 @@ class UsersServices {
       )
     ])
     const [access_token, refresh_token] = token;
+    await databaseService.refreshTokens.insertOne(new RefreshToken({token: refresh_token, user_id: new ObjectId(user_id)}))
 
     return {
       access_token,
@@ -251,6 +252,7 @@ class UsersServices {
     return user
   }
 
+  // follow
   async follow(user_id: string, followed_user_id: string){
     const followed = await databaseService.followers.findOne({
       user_id: new ObjectId(user_id),
@@ -268,6 +270,47 @@ class UsersServices {
     }
     return{
       message : USER_MESSAGE.FOLLOWED_USER
+    }
+  }
+
+  //unfollow
+  async unfollow(user_id: string, unfollowed_user_id: string){
+    const followed = await databaseService.followers.findOne({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(unfollowed_user_id)
+    })
+
+    if(followed){
+      await databaseService.followers.deleteOne({
+        _id: followed._id
+      })
+      return {
+        message: USER_MESSAGE.UNFOLLOW_SUCCESS
+      }
+    }
+    return{
+      message : USER_MESSAGE.USER_NOT_FOUND
+    }
+  }
+
+  // change password
+  async changePassword(user_id: string, new_password: string){
+    await databaseService.users.updateOne(
+      {
+        _id: new ObjectId(user_id)
+      },
+      {
+        $set: {
+          password: hashPassword(new_password)
+        },
+        $currentDate: {
+          updated_at: true
+        }
+      }
+    )
+
+    return {
+      message: USER_MESSAGE.CHANGE_PASSWORD_SUCCESS
     }
   }
 }

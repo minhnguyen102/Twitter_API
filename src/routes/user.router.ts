@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { verifyEmailController, userLogout, usersLogin, usersRegister, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController, getMeController, getMeControllerPatch, followControler } from '~/controllers/users.controllers';
-import { validateLogin, validateAccesstToken, validateRegister, validateRefreshToken, validateEmailVerifyToken, validateForgotPassword, validateForgotPasswordToken, validateResetPasswordToken, validatorVerifiedUser, validateUpdateMe, validateFollowed } from '~/middlewares/validates/users.validates';
+import { verifyEmailController, userLogout, usersLogin, usersRegister, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController, getMeController, getMeControllerPatch, followControler, unfollowControler, changePasswordControler } from '~/controllers/users.controllers';
+import { validateLogin, validateAccesstToken, validateRegister, validateRefreshToken, validateEmailVerifyToken, validateForgotPassword, validateForgotPasswordToken, validateResetPasswordToken, validatorVerifiedUser, validateUpdateMe, validateFollowed, validateUnfollowed, validateChangePassword } from '~/middlewares/validates/users.validates';
 import { wrapReqHandler } from '~/utils/handles';
 
 const usersRouter = Router()
@@ -95,5 +95,25 @@ usersRouter.patch("/me", validateAccesstToken, validatorVerifiedUser, validateUp
  * Body: {followed_user_id: string}
  */
 usersRouter.post("/follow", validateAccesstToken, validatorVerifiedUser, validateFollowed, wrapReqHandler(followControler))
+
+/*
+ * Description: Unfollow someone
+ * Path: /users/Unfollow
+ * Method: DELETE
+ * Header: {Authorization : Bearer <access_token>}
+ * Body: {unfollowed_user_id: string}
+ */
+usersRouter.delete("/unfollow", validateAccesstToken, validatorVerifiedUser, validateUnfollowed, wrapReqHandler(unfollowControler))
+
+/*
+ * Description: Change password
+ * Path: /users/change-password
+ * Method: POST
+ * Header: {Authorization : Bearer <access_token>}
+ * Body: {old_password: string, password: string, confirm_password: string}
+ */
+usersRouter.patch("/change-password", validateAccesstToken, validatorVerifiedUser, validateChangePassword, wrapReqHandler(changePasswordControler))
+
+
 
 export default usersRouter;

@@ -8,6 +8,7 @@ import httpStatus from "~/constants/httpStatus";
 import { USER_MESSAGE } from "~/constants/messages";
 import { ErrorWithStatus } from "~/models/Errors";
 import { TokenPayload } from "~/models/requests/User.requests";
+import User from "~/models/schemas/User.schema";
 import databaseService from "~/services/database.services";
 import usersServices from "~/services/users.services";
 import { hashPassword } from "~/utils/crypto";
@@ -473,3 +474,56 @@ export const validateFollowed = validate(
     }
   },['body'])
 )
+export const validateUnfollowed = validate(
+  checkSchema({
+    unfollowed_user_id: {
+      custom: {
+        options: async (value: string, {req}) => {
+          if(!ObjectId.isValid(value)){
+            throw new ErrorWithStatus({
+              message: USER_MESSAGE.INVALID_FOLLOWED_USER_ID,
+              status: httpStatus.NOT_FOUND
+            })
+          }
+          const unfollowed_user = await databaseService.users.findOne({
+            _id: new ObjectId(value)
+          })
+
+          if(unfollowed_user === null){
+            throw new ErrorWithStatus({
+              message: USER_MESSAGE.USER_NOT_FOUND,
+              status: httpStatus.NOT_FOUND
+            })
+          }
+        }
+      }
+    }
+  },['body'])
+)
+
+export const validateChangePassword = validate(checkSchema({
+  old_password: {
+    ...PasswordSchema,
+    custom: {
+      options: async (value: string, { req })=>{
+        const {user_id} = (req as Request).decoded_authorization as TokenPayload
+        const user = await databaseService.users.findOne({_id: new ObjectId(user_id)}) as User
+        if(!user){
+          throw new ErrorWithStatus({
+            message: USER_MESSAGE.USER_NOT_FOUND,
+            status: httpStatus.NOT_FOUND
+          })
+        }
+
+        if(user.password !== hashPassword(value)){
+          throw new ErrorWithStatus({
+            message: USER_MESSAGE.OLD_PASSWORD_NOT_MATCH,
+            status: httpStatus.UNAUTHORIZED
+          })
+        }
+      }
+    }
+  },
+  password: PasswordSchema,
+  confirm_password: ConfirmPasswordSchema
+}))
