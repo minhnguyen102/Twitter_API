@@ -28,6 +28,7 @@ export const USER_MESSAGE = {
   UNFOLLOW_SUCCESS: "Unfollow success",
   OLD_PASSWORD_NOT_MATCH: "Old password not match",
   CHANGE_PASSWORD_SUCCESS: "Change password success",
+  USERNAME_EXISTED: "Username existed",
   NAME: {
     REQUIRED: 'Tên không được để trống',
     INVALID: 'Tên phải là chuỗi từ 1 đến 100 ký tự',
@@ -66,7 +67,8 @@ export const USER_MESSAGE = {
   },
   USERNAME: {
     STRING: "Website must be string",
-    LENGTH: "Website length must be from 1 to 100"
+    LENGTH: "Website length must be from 1 to 100",
+    INVALID: "Username must be 4-15 characters long and contain only letter, numbers, underscore not only number"
   },
   IMAGE: {
     STRING: "Image must be string",

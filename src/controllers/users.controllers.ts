@@ -114,7 +114,7 @@ export const getMeController = async (req: Request, res: Response, next: NextFun
 }
 
 // [GET] /users/me
-export const getMeControllerPatch = async (req: Request<ParamsDictionary, any, UpdateMeReqBody>, res: Response, next: NextFunction) => {
+export const updateMeController = async (req: Request<ParamsDictionary, any, UpdateMeReqBody>, res: Response, next: NextFunction) => {
   const {body} = req
   const allowedFileds: (keyof UpdateMeReqBody)[] = [
     "name",

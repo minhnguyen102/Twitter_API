@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { verifyEmailController, userLogout, usersLogin, usersRegister, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController, getMeController, getMeControllerPatch, followControler, unfollowControler, changePasswordControler } from '~/controllers/users.controllers';
+import { verifyEmailController, userLogout, usersLogin, usersRegister, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController, getMeController, followControler, unfollowControler, changePasswordControler, updateMeController } from '~/controllers/users.controllers';
 import { validateLogin, validateAccesstToken, validateRegister, validateRefreshToken, validateEmailVerifyToken, validateForgotPassword, validateForgotPasswordToken, validateResetPasswordToken, validatorVerifiedUser, validateUpdateMe, validateFollowed, validateUnfollowed, validateChangePassword } from '~/middlewares/validates/users.validates';
 import { wrapReqHandler } from '~/utils/handles';
 
@@ -85,7 +85,7 @@ usersRouter.get("/me", validateAccesstToken, wrapReqHandler(getMeController))
  * Method: PATCH
  * Header: {Authorization : Bearer <access_token>}
  */
-usersRouter.patch("/me", validateAccesstToken, validatorVerifiedUser, validateUpdateMe, wrapReqHandler(getMeControllerPatch))
+usersRouter.patch("/me", validateAccesstToken, validatorVerifiedUser, validateUpdateMe, wrapReqHandler(updateMeController))
 
 /*
  * Description: follow someone
