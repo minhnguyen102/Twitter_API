@@ -29,6 +29,7 @@ export const USER_MESSAGE = {
   OLD_PASSWORD_NOT_MATCH: "Old password not match",
   CHANGE_PASSWORD_SUCCESS: "Change password success",
   USERNAME_EXISTED: "Username existed",
+  GMAIL_NOT_VERIFY: "Gmail not verify",
   NAME: {
     REQUIRED: 'Tên không được để trống',
     INVALID: 'Tên phải là chuỗi từ 1 đến 100 ký tự',

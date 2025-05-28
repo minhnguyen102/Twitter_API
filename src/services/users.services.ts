@@ -9,6 +9,12 @@ import RefreshToken from "~/models/schemas/RefreshToken.schema";
 import { USER_MESSAGE } from "~/constants/messages";
 import { after } from "lodash";
 import Follower from "~/models/schemas/Follower.schema";
+import axios from "axios";
+import { json } from "stream/consumers";
+import { ErrorWithStatus } from "~/models/Errors";
+import httpStatus from "~/constants/httpStatus";
+import randomPassword from "~/utils/randomPassword";
+import { verify } from "crypto";
 
 
 class UsersServices {
@@ -88,12 +94,12 @@ class UsersServices {
       // vì trong interface RegisterReqBody date_of_bỉrth là kiểu string, cần convert lại kiểu Date để hợp với hàm tạo trong class User
     }))
 
-    const [accessToken, refreshToken] = await this.signAccessTokenAndRefreshToken({user_id: user_id.toString(), verify: UserVerifyStatus.Unverified})
-    await databaseService.refreshTokens.insertOne(new RefreshToken({token: refreshToken, user_id: new ObjectId(user_id)}))
+    const [access_token, refresh_token] = await this.signAccessTokenAndRefreshToken({user_id: user_id.toString(), verify: UserVerifyStatus.Unverified})
+    await databaseService.refreshTokens.insertOne(new RefreshToken({token: refresh_token, user_id: new ObjectId(user_id)}))
     console.log("email_verify_token: ", email_verify_token);
     return {
-      accessToken,
-      refreshToken,
+      access_token,
+      refresh_token,
     }
   }
 
@@ -112,6 +118,99 @@ class UsersServices {
     return {
       accessToken,
       refreshToken
+    }
+  }
+
+  private async getOAuthGoogleToken(code: string){
+    const url = 'https://oauth2.googleapis.com/token'
+
+    const body = {
+      code, 
+      client_id: process.env.GOOGLE_CLIENT_ID,
+      client_secret: process.env.GOOGLE_CLIENT_SECRET,
+      redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+      grant_type: 'authorization_code'
+    }
+
+    try {
+      const {data} = await axios.post(url, body, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      })
+      return data as {
+        access_token: string,
+        id_token: string
+      }
+    } catch (error: any) {
+      console.error('Failed to get Google OAuth Tokens')
+      throw new Error(error.message)
+    }
+  }
+
+  private async getGoogleUserInfo(access_token: string, id_token: string){
+    try {
+      const {data} = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+        params: {
+          access_token,
+          alt: 'json'
+        },
+        headers: {
+          Authorization: `Bearer ${id_token}`
+        }
+      })
+      return data as {
+        sub: string,
+        name: string,
+        email: string,
+        picture: string,
+        email_verified: boolean
+      }
+    } catch (error: any) {
+      console.error('Failed to fetch Google user info')
+      throw new Error(error.message)
+    }
+  }
+
+  // oauth 
+  async oauth(code: string) {
+    const {access_token, id_token} = await this.getOAuthGoogleToken(code)
+    const userInfor = await this.getGoogleUserInfo(access_token, id_token);
+    if(!userInfor.email_verified){
+      throw new ErrorWithStatus({
+        message: USER_MESSAGE.GMAIL_NOT_VERIFY,
+        status: httpStatus.BAD_REQUEST
+      })
+    }
+    const user = await databaseService.users.findOne({email: userInfor.email})
+    // Nếu user đã tồn tại => cho phép đăng nhập => trả về cắp token
+    if(user){
+      const [access_token, refresh_token] = await this.signAccessTokenAndRefreshToken({
+        user_id: user._id.toString(),
+        verify: user.verify
+      })
+      await databaseService.refreshTokens.insertOne(new RefreshToken({token: refresh_token, user_id: user._id}))
+      return {
+        access_token,
+        refresh_token,
+        newUser: 0,
+        verify: user.verify
+      }
+    }else{
+      // Đăng kí tài khoản mới
+      const password = randomPassword(); // mặc định 12 kí tự
+      const data = await this.regiter({
+        name: userInfor.name,
+        email: userInfor.email,
+        password,
+        confirm_password: password,
+        date_of_birth: new Date().toISOString()
+      })
+      return {
+        ...data,
+        newUser: 1,
+        verify: UserVerifyStatus.Unverified
+      }
     }
   }
 

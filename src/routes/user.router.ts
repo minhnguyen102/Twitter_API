@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { verifyEmailController, userLogout, usersLogin, usersRegister, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController, getMeController, followControler, unfollowControler, changePasswordControler, updateMeController } from '~/controllers/users.controllers';
+import { verifyEmailController, userLogout, usersLogin, usersRegister, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController, getMeController, followControler, unfollowControler, changePasswordControler, updateMeController, oauthController } from '~/controllers/users.controllers';
 import { validateLogin, validateAccesstToken, validateRegister, validateRefreshToken, validateEmailVerifyToken, validateForgotPassword, validateForgotPasswordToken, validateResetPasswordToken, validatorVerifiedUser, validateUpdateMe, validateFollowed, validateUnfollowed, validateChangePassword } from '~/middlewares/validates/users.validates';
 import { wrapReqHandler } from '~/utils/handles';
 
@@ -12,6 +12,14 @@ const usersRouter = Router()
  * Body: {email: string, password: string}
  */
 usersRouter.post("/login", validateLogin, wrapReqHandler(usersLogin))
+
+/*
+ * Description: Oauth
+ * Path: /users/login/oauth
+ * Method: GET
+ 
+ */
+usersRouter.get("/login/oauth/google", wrapReqHandler(oauthController))
 
 /*
  * Description: Register

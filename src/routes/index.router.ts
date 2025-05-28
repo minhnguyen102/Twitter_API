@@ -1,9 +1,10 @@
-import { defaultErrorHandler } from '~/middlewares/errors.middleware';
 import userRouter from './user.router';
-import { Router, Request, Response, NextFunction } from 'express'
+import { Router} from 'express'
+import oauthRouter from './oauth.router';
 
 const router = Router()
 
 router.use("/users", userRouter);
+router.use("/", oauthRouter);
 
 export default router;

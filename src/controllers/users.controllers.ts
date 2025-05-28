@@ -23,6 +23,17 @@ export const usersLogin = async (req: Request<ParamsDictionary, any, LoginReqBod
   })
 }
 
+// [GET] /login/oauth/google
+export const oauthController = async (req: Request, res: Response) => {
+  const {code} = req.query
+  const result = await usersServices.oauth(code as string);
+  const {access_token, refresh_token, newUser, verify} = result
+  const url_redirect_client = process.env.GOOGLE_REDIRECT_URI_CLIENT
+  const query = `access_token=${access_token}&refresh_token=${refresh_token}&newUser=${newUser}&verify=${verify}`
+  const url = `${url_redirect_client}?${query}`
+  return res.redirect(url)
+}
+
 // [POST] /users/register
 export const usersRegister = async (req: Request<ParamsDictionary, any, RegisterReqBody>, res: Response) => {
   const  user = await usersServices.regiter(req.body);
