@@ -4,6 +4,9 @@ const port: number = 4000
 import router from './routes/index.router'
 import databaseService from './services/database.services'
 import { defaultErrorHandler } from './middlewares/errors.middleware'
+import { initFolder } from './utils/file'
+
+initFolder();
 
 databaseService.run().catch(console.dir);
 app.use(express.json());

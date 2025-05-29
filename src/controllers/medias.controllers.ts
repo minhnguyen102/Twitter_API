@@ -8,7 +8,7 @@ export const uploadSingleImageController = async (req: Request, res: Response, n
     uploadDir: path.resolve('uploads'),
     keepExtensions: true,
     maxFiles: 1,
-    maxFileSize: 3000 * 1024 // 300KB
+    maxFileSize: 3000 * 1024 * 1024 // 300MB
   });
   form.parse(req, (err, fields, files) => {
     if (err) {
