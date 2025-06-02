@@ -1,12 +1,16 @@
 import express from 'express'
 const app = express()
-const port: number = 4000
 import router from './routes/index.router'
 import databaseService from './services/database.services'
 import { defaultErrorHandler } from './middlewares/errors.middleware'
 import { initFolder } from './utils/file'
+import {config} from 'dotenv'
 
+
+config();
 initFolder();
+
+const port = process.env.PORT || 4000
 
 databaseService.run().catch(console.dir);
 app.use(express.json());
@@ -17,4 +21,5 @@ app.use(defaultErrorHandler)
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
+
 

@@ -1,12 +1,11 @@
-import { error } from 'console'
+import { File } from 'formidable'
 import fs from 'fs'
-import path, { resolve } from 'path'
+import { UPLOAD_TEMP_DIR } from '~/constants/dir'
 
 export const initFolder = () =>{
-  const uploadFolderPath = path.resolve('uploads')
-  if(!fs.existsSync(uploadFolderPath)){
+  if(!fs.existsSync(UPLOAD_TEMP_DIR)){
     // tạo mới folder
-    fs.mkdirSync(uploadFolderPath, {
+    fs.mkdirSync(UPLOAD_TEMP_DIR, {
       recursive: true // cho phép nested
     })
   }
@@ -15,7 +14,7 @@ export const initFolder = () =>{
 export const handlerUploadSingleImage = async (req: Request) => {
   const formidable = (await (import('formidable'))).default // Cách import 1 file esmodule vào dự án common js
   const form = formidable({
-    uploadDir: path.resolve('uploads'),
+    uploadDir: UPLOAD_TEMP_DIR,
     keepExtensions: true,
     maxFiles: 1,
     maxFileSize: 300 * 1024 * 1024, // 300MB,
@@ -27,18 +26,21 @@ export const handlerUploadSingleImage = async (req: Request) => {
       return valid
     }
   });
-  return new Promise((resolve, reject) => {
+  return new Promise<File>((resolve, reject) => {
     form.parse(req as any, (err, fields, files) => {
-      // console.log("files", files)
-      // console.log("fields", fields)
-      // console.log('error:', Boolean(err))
       if (err) {
         return reject(err)
       }
       if(!Boolean(files.image)){
         return reject(new Error("File is empty"))
       }
-      resolve(files)
+      resolve((files.image as File[])[0])
     });
   })
+}
+
+export const getNameFromFullname = (fullname: string) => {
+  const namearr = fullname.split(".")
+  namearr.pop()
+  return namearr.join('')
 }
