@@ -10,3 +10,7 @@ export enum UserVerifyStatus {
   Verified,
   Banner
 }
+export enum MediaType {
+  Image,
+  Video
+}
