@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import usersServices from "~/services/users.services";
 import { NextFunction, ParamsDictionary } from 'express-serve-static-core'
-import { ChangePasswordReqBody, FollowReqBody, LoginReqBody, LogoutReqBody, RegisterReqBody, ResetPasswordBody, TokenPayload, UnfollowReqBody, UpdateMeReqBody, VerifyEmailReqBody } from "~/models/requests/User.requests";
+import { ChangePasswordReqBody, FollowReqBody, LoginReqBody, LogoutReqBody, RefreshTokenReqBody, RegisterReqBody, ResetPasswordBody, TokenPayload, UnfollowReqBody, UpdateMeReqBody, VerifyEmailReqBody } from "~/models/requests/User.requests";
 import User from "~/models/schemas/User.schema";
 import { ObjectId } from "mongodb";
 import { USER_MESSAGE } from "~/constants/messages";
@@ -49,6 +49,17 @@ export const userLogout = async (req: Request<ParamsDictionary, any, LogoutReqBo
   await usersServices.logout(refresh_token);
   return res.json({
     message: USER_MESSAGE.LOGOUT_SUCCESS
+  })
+}
+
+// [POST] /users/refresh-token
+export const RefreshTokenController = async (req: Request<ParamsDictionary, any, RefreshTokenReqBody>, res: Response) => {
+  const { user_id, verify } = req.decoded_refresh_token as TokenPayload
+  const { refresh_token } = req.body
+  const result = await usersServices.refreshToken({user_id, verify, refresh_token })
+  res.json({
+    message: USER_MESSAGE.REFRESH_TOKEN_SUCCESS,
+    result
   })
 }
 

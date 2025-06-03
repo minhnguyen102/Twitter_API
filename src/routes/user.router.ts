@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { verifyEmailController, userLogout, usersLogin, usersRegister, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController, getMeController, followControler, unfollowControler, changePasswordControler, updateMeController, oauthController } from '~/controllers/users.controllers';
+import { verifyEmailController, userLogout, usersLogin, usersRegister, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController, getMeController, followControler, unfollowControler, changePasswordControler, updateMeController, oauthController, RefreshTokenController } from '~/controllers/users.controllers';
 import { validateLogin, validateAccesstToken, validateRegister, validateRefreshToken, validateEmailVerifyToken, validateForgotPassword, validateForgotPasswordToken, validateResetPasswordToken, validatorVerifiedUser, validateUpdateMe, validateFollowed, validateUnfollowed, validateChangePassword } from '~/middlewares/validates/users.validates';
 import { wrapReqHandler } from '~/utils/handles';
 
@@ -36,6 +36,14 @@ usersRouter.post("/register", validateRegister, wrapReqHandler(usersRegister))
  * Body: {refresh_token: string}
  */
 usersRouter.post("/logout", validateAccesstToken, validateRefreshToken, wrapReqHandler(userLogout))
+
+/*
+ * Description: Refresh Token
+ * Path: /users/refresh-token
+ * Method: POST
+ * Body: {refresh_token: string}
+ */
+usersRouter.post("/refresh-token", validateRefreshToken, wrapReqHandler(RefreshTokenController))
 
 /*
  * Description:  Verify-email
