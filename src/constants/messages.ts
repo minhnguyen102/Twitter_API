@@ -1,4 +1,6 @@
 export const USER_MESSAGE = {
+  UPLOAD_IMAGE_SUCCESSFULLY: 'Upload image successfully',
+  UPLOAD_VIDEO_SUCCESSFULLY: "Upload video successfully",
   VALIDATION_ERROR : 'validation_error',
   USER_NOT_FOUND: "User not found",
   LOGIN_SUCCESS: "Login success",

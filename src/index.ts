@@ -5,8 +5,7 @@ import databaseService from './services/database.services'
 import { defaultErrorHandler } from './middlewares/errors.middleware'
 import { initFolder } from './utils/file'
 import {config} from 'dotenv'
-import path from 'path'
-import { UPLOAD_DIR } from './constants/dir'
+import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from './constants/dir'
 
 
 config();
@@ -17,7 +16,8 @@ const port = process.env.PORT || 4000
 databaseService.run().catch(console.dir);
 app.use(express.json());
 app.use(router);
-app.use('/uploads', express.static(UPLOAD_DIR))
+app.use('/uploads', express.static(UPLOAD_IMAGE_DIR))
+app.use('/uploads/video', express.static(UPLOAD_VIDEO_DIR))
 
 app.use(defaultErrorHandler)
 
