@@ -17,6 +17,8 @@ const port = process.env.PORT || 4000
 
 databaseService.run().catch(console.dir).then(() => {
   databaseService.createIndexUser()
+  databaseService.createIndexRefreshToken()
+  databaseService.createIndexFollower()
 });
 app.use(express.json());
 app.use(router);
