@@ -12,7 +12,8 @@ export interface RegisterReqBody{
 export interface TokenPayload extends JwtPayload{
   user_id: string,
   type: TokenType,
-  verify: UserVerifyStatus
+  verify: UserVerifyStatus,
+  exp: number
 }
 
 export interface LoginReqBody{

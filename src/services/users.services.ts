@@ -7,16 +7,14 @@ import { TokenType, UserVerifyStatus } from "~/constants/enums";
 import { ObjectId } from "mongodb";
 import RefreshToken from "~/models/schemas/RefreshToken.schema";
 import { USER_MESSAGE } from "~/constants/messages";
-import { after } from "lodash";
 import Follower from "~/models/schemas/Follower.schema";
 import axios from "axios";
-import { json } from "stream/consumers";
 import { ErrorWithStatus } from "~/models/Errors";
 import httpStatus from "~/constants/httpStatus";
 import randomPassword from "~/utils/randomPassword";
-import { verify } from "crypto";
 import { generateUniqueName } from "~/utils/randomName";
-
+import {config} from 'dotenv'
+config()
 
 class UsersServices {
   private signAccessToken({ user_id, verify } : {user_id: string, verify: UserVerifyStatus}){
@@ -32,7 +30,18 @@ class UsersServices {
       }
     })
   }
-  private signRefreshToken({ user_id, verify } : {user_id: string, verify: UserVerifyStatus}){
+  private signRefreshToken({ user_id, verify, exp } : {user_id: string, verify: UserVerifyStatus, exp?: number}){
+    if(exp){
+      return signToken({
+        payload: {
+          user_id,
+          type: TokenType.RefreshToken,
+          verify,
+          exp
+        },
+        privateKey: process.env.JWT_SECRET_REFRESH_TOKEN as string,
+      })
+    }
     return signToken({
       payload: {
         user_id,
@@ -223,10 +232,10 @@ class UsersServices {
   }
 
   // refreshToken
-  async refreshToken({user_id, verify, refresh_token} : {user_id: string, verify: UserVerifyStatus, refresh_token: string}){
+  async refreshToken({user_id, verify, refresh_token, exp} : {user_id: string, verify: UserVerifyStatus, refresh_token: string, exp: number}){
     const [new_access_token, new_refresh_token] = await Promise.all([
       this.signAccessToken({user_id, verify}),
-      this.signRefreshToken({user_id, verify}),
+      this.signRefreshToken({user_id, verify, exp}),
       databaseService.refreshTokens.deleteOne({token: refresh_token})
     ])
     await databaseService.refreshTokens.insertOne(new RefreshToken({token: new_refresh_token, user_id: new ObjectId(user_id)}))
