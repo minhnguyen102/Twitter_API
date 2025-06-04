@@ -15,6 +15,7 @@ import { ErrorWithStatus } from "~/models/Errors";
 import httpStatus from "~/constants/httpStatus";
 import randomPassword from "~/utils/randomPassword";
 import { verify } from "crypto";
+import { generateUniqueName } from "~/utils/randomName";
 
 
 class UsersServices {
@@ -90,8 +91,10 @@ class UsersServices {
       _id: user_id,
       email_verify_token: email_verify_token,
       date_od_birth: new Date(payload.date_of_birth),
-      password: hashPassword(payload.password)
+      password: hashPassword(payload.password),
       // vì trong interface RegisterReqBody date_of_bỉrth là kiểu string, cần convert lại kiểu Date để hợp với hàm tạo trong class User
+      // cần gen thêm username ở đây: 
+      username: generateUniqueName()
     }))
 
     const [access_token, refresh_token] = await this.signAccessTokenAndRefreshToken({user_id: user_id.toString(), verify: UserVerifyStatus.Unverified})
