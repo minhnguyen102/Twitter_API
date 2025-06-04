@@ -13,7 +13,8 @@ export interface TokenPayload extends JwtPayload{
   user_id: string,
   type: TokenType,
   verify: UserVerifyStatus,
-  exp: number
+  exp: number,
+  iat: number
 }
 
 export interface LoginReqBody{
