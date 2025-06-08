@@ -16,13 +16,13 @@ export enum MediaType {
 }
 
 export enum TweetType {
-  Tweet,
-  Retweet,
-  Comment,
-  QuoteTweet
+  Tweet, // Tweet gốc
+  Retweet, // chia sẻ lại 1 tweet mà không comment gì cả 
+  Comment, // Comment dưới 1 tweet gốc
+  QuoteTweet // chia sẻ lại 1 tweet và comment
 }
 
 export enum TweetAudience {
-  Everyone,
-  TwiiterCircle
+  Everyone, // Cho mọi người cùng xem
+  TwiiterCircle // Chỉ định, có giới hạn
 }

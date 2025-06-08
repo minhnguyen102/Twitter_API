@@ -9,8 +9,8 @@ interface TweetConstructor{
   audience: TweetAudience
   content: string
   parent_id: null | ObjectId
-  hashtags: ObjectId[]
-  mentions: ObjectId[]
+  hashtags: string[] // ['java', 'nodejs']
+  mentions: ObjectId[] // ['minhnguyen', 'elonmusk']
   medias: Media[]
   guest_views: number
   user_views: number
@@ -25,7 +25,7 @@ export default class Tweet{
   audience: TweetAudience
   content: string
   parent_id: null | ObjectId
-  hashtags: ObjectId[]
+  hashtags: string[]
   mentions: ObjectId[]
   medias: Media[]
   guest_views: number
