@@ -6,13 +6,13 @@ import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from "~/constants/dir";
 import { isProduction } from "~/utils/config";
 import { config } from "dotenv";
 import { MediaType } from "~/constants/enums";
-import { Meida } from "~/models/Others";
+import { Media } from "~/models/Others";
 config();
 
 class MediaService{
   async handlerUploadImage(req: Request){
     const files = await handlerUploadImage(req as any)
-    const result: Meida[] = await Promise.all(files.map( async file => {
+    const result: Media[] = await Promise.all(files.map( async file => {
       const newName = getNameFromFullname(file.newFilename);
       const newpath = path.resolve(UPLOAD_IMAGE_DIR, `${newName}.jpg`)
       await sharp(file.filepath).jpeg().toFile(newpath)
