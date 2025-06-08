@@ -79,3 +79,14 @@ export const USER_MESSAGE = {
     LENGTH: "Image length must be from 1 to 400"
   },
 } as const
+
+
+export const TWEET_MESSAGE  = {
+  PARENT_ID_MUST_BE_A_VALID_TWEET_ID: "ParentId must be a valid tweet id",
+  PARENT_ID_MUST_BE_NULL: "ParentId must be null",
+  CONTENT_MUST_BE_PROVIDED: "Content must be provided",
+  CONTENT_MUST_BE_NULL: "Content must be null",
+  HASHTAGS_MUST_BE_ARRAY_OF_STRINGS: "Hashtags must be an array of strings",
+  MENTIONS_MUST_BE_ARRAY_OF_USER_IDS: "Mentions must be an array of user ids",
+  MEDIAS_MUST_BE_ARRAY_OF_MEDIA_OBJECTS: "Medias must be an array of media objects",
+} as const
