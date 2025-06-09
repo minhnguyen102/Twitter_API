@@ -1,8 +1,8 @@
 import { checkSchema } from "express-validator"
-import { has, isEmpty } from "lodash"
+import { isEmpty } from "lodash"
 import { ObjectId } from "mongodb"
 import { MediaType, TweetAudience, TweetType } from "~/constants/enums"
-import { TWEET_MESSAGE, USER_MESSAGE } from "~/constants/messages"
+import { TWEET_MESSAGE } from "~/constants/messages"
 import { numberEnumToArray } from "~/utils/others"
 import { validate } from "~/utils/validation"
 

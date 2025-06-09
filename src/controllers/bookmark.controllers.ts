@@ -6,7 +6,7 @@ import { TokenPayload } from "~/models/requests/User.requests"
 import bookmarkService from "~/services/bookmark.services"
 
 
-// [POST] /tweets
+// [POST] /bookmarks
 export const bookmarkTweetController = async (req: Request<ParamsDictionary, any, bookmarkTweetReqBody>, res: Response, next: NextFunction) => {
   const {user_id} = await req.decoded_authorization as TokenPayload
   const result = await bookmarkService.bookmarkTweet(user_id ,req.body.tweet_id)
