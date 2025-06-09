@@ -90,3 +90,7 @@ export const TWEET_MESSAGE  = {
   MENTIONS_MUST_BE_ARRAY_OF_USER_IDS: "Mentions must be an array of user ids",
   MEDIAS_MUST_BE_ARRAY_OF_MEDIA_OBJECTS: "Medias must be an array of media objects",
 } as const
+
+export const BOOKMARK_MESSAGE = {
+  BOOKMARK_SUCCESSFULLY : "Bookmark successfully"
+}
