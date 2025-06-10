@@ -94,5 +94,6 @@ export const TWEET_MESSAGE  = {
 export const BOOKMARK_MESSAGE = {
   BOOKMARK_SUCCESSFULLY : "Bookmark successfully",
   TWEET_ID_MUST_BE_A_VALID_TWEET_ID: "Tweet_id must be a valid tweet_id",
-  TWEET_ID_NOT_NULL: "Tweet_id not null"
+  TWEET_ID_NOT_NULL: "Tweet_id not null",
+  UN_BOOKMARK_SUCCESSFULLY: "Unbookmark successfully"
 }

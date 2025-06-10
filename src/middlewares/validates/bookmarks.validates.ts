@@ -18,5 +18,5 @@ export const validateBookmarkTweet = validate(
         }
       }
     }
-  })
+  },['body'])
 )

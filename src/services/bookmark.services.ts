@@ -1,6 +1,7 @@
-import { ObjectId } from "mongodb"
+import { ObjectId, WithId } from "mongodb"
 import databaseService from "./database.services"
 import Bookmark from "~/models/schemas/Bookmark.schema"
+import { BOOKMARK_MESSAGE } from "~/constants/messages"
 
 class BookmarkService{
   async bookmarkTweet(user_id: string, tweet_id: string){
@@ -20,8 +21,19 @@ class BookmarkService{
         returnDocument: "after"
       }
     )
-    console.log(result)
-    return result
+    return result as WithId<Bookmark>
+  }
+
+  async unBookmarkTweet(user_id: string, tweet_id: string){
+    await databaseService.bookmarks.findOneAndDelete(
+      {
+        user_id: new ObjectId(user_id),
+        tweet_id: new ObjectId(tweet_id)
+      }
+    )
+    return {
+      message : BOOKMARK_MESSAGE.UN_BOOKMARK_SUCCESSFULLY,
+    }
   }
 }
 
