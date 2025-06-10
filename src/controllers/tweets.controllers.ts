@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express"
 import { ParamsDictionary } from "express-serve-static-core"
 import { TweetReqBody } from "~/models/requests/Tweet.requets"
 import { TokenPayload } from "~/models/requests/User.requests"
+import databaseService from "~/services/database.services"
 import tweetService from "~/services/tweet.services"
 
 
@@ -12,5 +13,14 @@ export const createTweetController = async (req: Request<ParamsDictionary, any, 
   // console.log(tweet)
   res.json({
     result : tweet
+  })
+}
+
+// [POST] /tweets
+export const detailTweetController = async (req: Request, res: Response, next: NextFunction) => {
+  const tweet_id = req.params.tweet_id
+  const result = await tweetService.detailTweet(tweet_id)
+  res.json({
+    result
   })
 }

@@ -7,7 +7,7 @@ import { ErrorWithStatus } from "~/models/Errors";
 import databaseService from "~/services/database.services";
 import { validate } from "~/utils/validation";
 
-export const validateBookmarkTweet = validate(
+export const validateTweetId = validate(
   checkSchema({
     tweet_id: {
       custom: {

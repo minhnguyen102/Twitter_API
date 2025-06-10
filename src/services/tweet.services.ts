@@ -40,6 +40,10 @@ class TweetService{
     })
     return tweet
   }
+  async detailTweet(tweet_id: string){
+    const tweet = await databaseService.tweets.findOne({_id: new ObjectId(tweet_id)})
+    return tweet
+  }
 }
 
 const tweetService = new TweetService()
