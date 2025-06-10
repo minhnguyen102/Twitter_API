@@ -33,6 +33,8 @@ export const USER_MESSAGE = {
   CHANGE_PASSWORD_SUCCESS: "Change password success",
   USERNAME_EXISTED: "Username existed",
   GMAIL_NOT_VERIFY: "Gmail not verify",
+  USER_IS_BANNER: "User is banner",
+  TWEET_IS_NOT_PUBLIC: "Tweet is not public",
   NAME: {
     REQUIRED: 'Tên không được để trống',
     INVALID: 'Tên phải là chuỗi từ 1 đến 100 ký tự',

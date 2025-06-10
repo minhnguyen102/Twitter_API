@@ -1,6 +1,6 @@
 import { Router } from "express"
 import { createTweetController, detailTweetController } from "~/controllers/tweets.controllers"
-import { validateTweetId } from "~/middlewares/validates/bookmarks.validates"
+import { validateAudience, validateTweetId } from "~/middlewares/validates/bookmarks.validates"
 import { validateCreateTweet } from "~/middlewares/validates/tweets.validates"
 import { validateAccesstToken, validateIsUserLogin, validatorVerifiedUser } from "~/middlewares/validates/users.validates"
 import { wrapReqHandler } from "~/utils/handles"
@@ -26,6 +26,7 @@ tweetsRouter.get("/:tweet_id",
   validateTweetId, 
   validateIsUserLogin(validateAccesstToken), 
   validateIsUserLogin(validatorVerifiedUser), 
+  wrapReqHandler(validateAudience),
   wrapReqHandler(detailTweetController))
 
 
