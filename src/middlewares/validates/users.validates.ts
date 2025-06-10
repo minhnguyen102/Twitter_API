@@ -533,3 +533,14 @@ export const validateChangePassword = validate(checkSchema({
   password: PasswordSchema,
   confirm_password: ConfirmPasswordSchema
 }))
+
+// Nếu người dùng có đăng nhập thì kiểm tra access_token => user_id => so sánh trong tweeter_circle và verify_user. Không thì vẫn next()
+export const validateIsUserLogin = (middleware: (req: Request, res: Response, next: NextFunction) => void) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    console.log(req.headers)
+    if(req.headers.authorization){
+      return  middleware(req, res, next)
+    }
+    next()
+  }
+}
