@@ -21,7 +21,7 @@ bookmarkRouter.post("/", validateAccesstToken, validatorVerifiedUser, validateBo
  * Method: DELETE
  * Header: {Authorization : Bearer <access_token>}
  */
-bookmarkRouter.delete("/tweets/:tweet_id", validateAccesstToken, validatorVerifiedUser, wrapReqHandler(unBookmarkTweetController))
+bookmarkRouter.delete("/tweets/:tweet_id", validateAccesstToken, validatorVerifiedUser, validateBookmarkTweet, wrapReqHandler(unBookmarkTweetController))
 
 
 export default bookmarkRouter
