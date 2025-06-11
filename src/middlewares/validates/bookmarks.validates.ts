@@ -1,4 +1,3 @@
-import { config } from "dotenv";
 import { checkSchema } from "express-validator";
 import { ObjectId } from "mongodb";
 import httpStatus from "~/constants/httpStatus";
@@ -23,7 +22,81 @@ export const validateTweetId = validate(
               message: BOOKMARK_MESSAGE.TWEET_ID_IN_VALID
             })
           }
-          const tweet = await databaseService.tweets.findOne({_id : new ObjectId(value)})
+          const [tweet] = await databaseService.tweets.aggregate<Tweet>([
+            {
+              '$match': {
+                '_id': new ObjectId('6847f9632447f7b76307a375')
+              }
+            }, {
+              '$lookup': {
+                'from': 'tweets', 
+                'localField': '_id', 
+                'foreignField': 'parent_id', 
+                'as': 'tweet_children'
+              }
+            }, {
+              '$lookup': {
+                'from': 'bookmarks', 
+                'localField': '_id', 
+                'foreignField': 'tweet_id', 
+                'as': 'bookmarks'
+              }
+            }, {
+              '$addFields': {
+                'bookmarks': {
+                  '$size': '$bookmarks'
+                }, 
+                'retweet_count': {
+                  '$size': {
+                    '$filter': {
+                      'input': '$tweet_children', 
+                      'as': 'item', 
+                      'cond': {
+                        '$eq': [
+                          '$$item.type', 1
+                        ]
+                      }
+                    }
+                  }
+                }, 
+                'commnent_count': {
+                  '$size': {
+                    '$filter': {
+                      'input': '$tweet_children', 
+                      'as': 'item', 
+                      'cond': {
+                        '$eq': [
+                          '$$item.type', 2
+                        ]
+                      }
+                    }
+                  }
+                }, 
+                'quote_count': {
+                  '$size': {
+                    '$filter': {
+                      'input': '$tweet_children', 
+                      'as': 'item', 
+                      'cond': {
+                        '$eq': [
+                          '$$item.type', 3
+                        ]
+                      }
+                    }
+                  }
+                }, 
+                'views': {
+                  '$add': [
+                    '$user_views', '$guest_views'
+                  ]
+                }
+              }
+            }, {
+              '$project': {
+                'tweet_children': 0
+              }
+            }]
+          ).toArray()
           if(!tweet){
             throw new ErrorWithStatus(
               {
@@ -63,7 +136,6 @@ export const validateAudience = async (req: Request, res: Response, next: NextFu
     }
     // Kiểm tra xem người dùng có trong danh sách tweeter_circle hay không
     const isInTweeterCircle = author.tweeter_circle.some((user_circle_id) => user_circle_id.equals(user_id))
-    console.log(isInTweeterCircle)
     if(!isInTweeterCircle && !author_id.equals(user_id)){
       throw new ErrorWithStatus({
         message : USER_MESSAGE.TWEET_IS_NOT_PUBLIC,

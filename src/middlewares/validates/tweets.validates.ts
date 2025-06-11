@@ -1,5 +1,5 @@
 import { checkSchema } from "express-validator"
-import { isEmpty } from "lodash"
+import { isEmpty, isString } from "lodash"
 import { ObjectId } from "mongodb"
 import { MediaType, TweetAudience, TweetType } from "~/constants/enums"
 import { TWEET_MESSAGE } from "~/constants/messages"
@@ -46,7 +46,7 @@ export const validateCreateTweet = validate(
           const medias = req.body.medias
           const hashtags = req.body.hashtags
           const mentions = req.body.mentions
-          if(type === TweetType.Retweet && value !== null){
+          if(type === TweetType.Retweet && value !== ""){
             throw new Error(TWEET_MESSAGE.CONTENT_MUST_BE_NULL)
           }
 
