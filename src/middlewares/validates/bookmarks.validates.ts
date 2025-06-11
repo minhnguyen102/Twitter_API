@@ -25,7 +25,7 @@ export const validateTweetId = validate(
           const [tweet] = await databaseService.tweets.aggregate<Tweet>([
             {
               '$match': {
-                '_id': new ObjectId('6847f9632447f7b76307a375')
+                '_id': new ObjectId(value)
               }
             }, {
               '$lookup': {

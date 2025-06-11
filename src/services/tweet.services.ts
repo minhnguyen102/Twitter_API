@@ -4,6 +4,7 @@ import { ObjectId, WithId } from "mongodb";
 import Tweet from "~/models/schemas/Tweet.schema";
 import Hashtag from "~/models/schemas/Hashtag.schema";
 import { hash } from "crypto";
+import { TweetType } from "~/constants/enums";
 
 class TweetService{
   async findOrCreateHashtag(hashtags: string[]){
@@ -63,6 +64,97 @@ class TweetService{
       user_views: number,
       guest_views: number
     }>
+  }
+
+  async getDetailTweetChildren({tweet_id, type, limit, page} : {tweet_id: string, type: TweetType, limit: number, page: number}){
+    const tweetDetailChildren = await databaseService.tweets.aggregate(
+      [
+        {
+          '$match': {
+            'parent_id': new ObjectId(tweet_id), 
+            'type': type
+          }
+        }, {
+          '$lookup': {
+            'from': 'tweets', 
+            'localField': '_id', 
+            'foreignField': 'parent_id', 
+            'as': 'tweet_children'
+          }
+        }, {
+          '$lookup': {
+            'from': 'bookmarks', 
+            'localField': '_id', 
+            'foreignField': 'tweet_id', 
+            'as': 'results'
+          }
+        }, {
+          '$addFields': {
+            'retweet_count': {
+              '$size': {
+                '$filter': {
+                  'input': '$tweet_children', 
+                  'as': 'item', 
+                  'cond': {
+                    '$eq': [
+                      '$$item.type', TweetType.Retweet
+                    ]
+                  }
+                }
+              }
+            }, 
+            'commnent_count': {
+              '$size': {
+                '$filter': {
+                  'input': '$tweet_children', 
+                  'as': 'item', 
+                  'cond': {
+                    '$eq': [
+                      '$$item.type', TweetType.Comment
+                    ]
+                  }
+                }
+              }
+            }, 
+            'quote_count': {
+              '$size': {
+                '$filter': {
+                  'input': '$tweet_children', 
+                  'as': 'item', 
+                  'cond': {
+                    '$eq': [
+                      '$$item.type', TweetType.QuoteTweet
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }, {
+          '$addFields': {
+            'views': {
+              '$add': [
+                '$user_views', '$guest_views'
+              ]
+            }
+          }
+        }, {
+          '$project': {
+            'result': 0, 
+            'tweet_children': 0
+          }
+        }, {
+          '$skip': limit * (page - 1)
+        }, {
+          '$limit': limit
+        }
+      ]
+    ).toArray()
+    const totalDocument = await databaseService.tweets.countDocuments({
+      'parent_id': new ObjectId(tweet_id), 
+      'type': type
+    })
+    return {tweetDetailChildren, totalDocument}
   }
 }
 
