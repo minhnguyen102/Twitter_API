@@ -50,23 +50,28 @@ class TweetService{
         _id: new ObjectId(tweet_id)
       },
       {
-        $inc: views
+        $inc: views,
+        $currentDate: {
+          updated_at: true
+        }
       },
       {
         returnDocument: "after",
         projection: {
           user_views: 1,
-          guest_views: 1
+          guest_views: 1,
+          updated_at: 1
         }
       }
     )
     return result as WithId<{
       user_views: number,
-      guest_views: number
+      guest_views: number,
+      updated_at: Date
     }>
   }
 
-  async getDetailTweetChildren({tweet_id, type, limit, page} : {tweet_id: string, type: TweetType, limit: number, page: number}){
+  async getDetailTweetChildren({tweet_id, type, limit, page, user_id} : {tweet_id: string, type: TweetType, limit: number, page: number, user_id?: string}){
     const tweetDetailChildren = await databaseService.tweets.aggregate(
       [
         {
@@ -130,15 +135,8 @@ class TweetService{
               }
             }
           }
-        }, {
-          '$addFields': {
-            'views': {
-              '$add': [
-                '$user_views', '$guest_views'
-              ]
-            }
-          }
-        }, {
+        }, 
+        {
           '$project': {
             'result': 0, 
             'tweet_children': 0
@@ -150,9 +148,34 @@ class TweetService{
         }
       ]
     ).toArray()
-    const totalDocument = await databaseService.tweets.countDocuments({
-      'parent_id': new ObjectId(tweet_id), 
-      'type': type
+    const tweet_children_ids = tweetDetailChildren.map(tweet => tweet._id)
+    const inc = user_id? {user_views: 1} : {guest_views: 1}
+    const date = new Date
+    const [, totalDocument] = await Promise.all([
+      databaseService.tweets.updateMany(
+        {
+          _id: {
+            $in: tweet_children_ids
+          }
+        }, {
+          $inc: inc,
+          $set: {
+            updated_at: date
+          }
+        }
+      ),
+      await databaseService.tweets.countDocuments({
+        'parent_id': new ObjectId(tweet_id), 
+        'type': type
+      })
+    ])
+    tweetDetailChildren.forEach(tweet => {
+      tweet.updated_at= date
+      if(user_id){
+        tweet.user_views += 1 // không cộng trực tiếp trong db, để đảm bảo kết quả trả về là đúng
+      }else{
+        tweet.guest_views += 1
+      }
     })
     return {tweetDetailChildren, totalDocument}
   }

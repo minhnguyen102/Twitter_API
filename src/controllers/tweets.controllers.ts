@@ -23,7 +23,8 @@ export const detailTweetController = async (req: Request, res: Response, next: N
   const tweet = {
     ...req.tweet,
     guest_views : views.guest_views,
-    user_views: views.user_views
+    user_views: views.user_views,
+    updated_at: views.updated_at
   }
   res.json({
     result: tweet
@@ -36,8 +37,9 @@ export const detailTweetChildrenController = async (req: Request, res: Response,
   const type = Number(req.query.type as string) as TweetType
   const limit = Number(req.query.limit)
   const page = Number(req.query.page)
+  const user_id = req.decoded_authorization?.user_id
 
-  const {tweetDetailChildren, totalDocument} = await tweetService.getDetailTweetChildren({tweet_id, type, limit, page})
+  const {tweetDetailChildren, totalDocument} = await tweetService.getDetailTweetChildren({tweet_id, type, limit, page, user_id})
   res.json({
     message: "Get tweet detail children successfully",
     tweetDetailChildren,
