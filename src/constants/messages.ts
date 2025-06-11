@@ -91,6 +91,9 @@ export const TWEET_MESSAGE  = {
   HASHTAGS_MUST_BE_ARRAY_OF_STRINGS: "Hashtags must be an array of strings",
   MENTIONS_MUST_BE_ARRAY_OF_USER_IDS: "Mentions must be an array of user ids",
   MEDIAS_MUST_BE_ARRAY_OF_MEDIA_OBJECTS: "Medias must be an array of media objects",
+  INVALID_TYPE: "Invalidd type",
+  LIMIT_MUST_FROM_1_TO_100: "Limit must from 1 to 100",
+  PAGE_MUST_GREATE_THAN_1_AND_NUMBER: "Page must greate than 1 and is number"
 } as const
 
 export const BOOKMARK_MESSAGE = {

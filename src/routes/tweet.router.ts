@@ -1,7 +1,7 @@
 import { Router } from "express"
 import { createTweetController, detailTweetChildrenController, detailTweetController } from "~/controllers/tweets.controllers"
 import { validateAudience, validateTweetId } from "~/middlewares/validates/bookmarks.validates"
-import { validateCreateTweet } from "~/middlewares/validates/tweets.validates"
+import { validateCreateTweet, validateGetTweetChildren } from "~/middlewares/validates/tweets.validates"
 import { validateAccesstToken, validateIsUserLogin, validatorVerifiedUser } from "~/middlewares/validates/users.validates"
 import { wrapReqHandler } from "~/utils/handles"
 
@@ -38,6 +38,7 @@ tweetsRouter.get("/:tweet_id",
  */
 tweetsRouter.get("/:tweet_id/children", 
   validateTweetId, 
+  validateGetTweetChildren,
   validateIsUserLogin(validateAccesstToken), 
   validateIsUserLogin(validatorVerifiedUser), 
   wrapReqHandler(validateAudience),

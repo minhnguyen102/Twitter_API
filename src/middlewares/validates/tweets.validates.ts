@@ -1,4 +1,4 @@
-import { checkSchema } from "express-validator"
+import { check, checkSchema } from "express-validator"
 import { isEmpty, isString } from "lodash"
 import { ObjectId } from "mongodb"
 import { MediaType, TweetAudience, TweetType } from "~/constants/enums"
@@ -95,4 +95,39 @@ export const validateCreateTweet = validate(
       }
     }
   },['body'])
+)
+
+export const validateGetTweetChildren = validate(
+  checkSchema({
+    type: {
+      isIn: {
+        options: [TweetType],
+        errorMessage: TWEET_MESSAGE.INVALID_TYPE
+      }
+    },
+    limit: {
+      isNumeric: true,
+      custom: {
+        options: (value) => {
+          const num = Number(value)
+          if(num > 100 || num < 1){
+            throw new Error(TWEET_MESSAGE.LIMIT_MUST_FROM_1_TO_100)
+          }
+          return true
+        }
+      }
+    },
+    page: {
+      isNumeric: true,
+      custom: {
+        options: async (value) => {
+          const num = Number(value)
+          if(num < 0 || isNaN(value)){
+            throw new Error(TWEET_MESSAGE.PAGE_MUST_GREATE_THAN_1_AND_NUMBER)
+          }
+          return true
+        }
+      }
+    },
+  }, ['params', 'query'])
 )
