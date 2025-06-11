@@ -84,11 +84,6 @@ export const validateTweetId = validate(
                       }
                     }
                   }
-                }, 
-                'views': {
-                  '$add': [
-                    '$user_views', '$guest_views'
-                  ]
                 }
               }
             }, {

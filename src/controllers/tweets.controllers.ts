@@ -18,7 +18,13 @@ export const createTweetController = async (req: Request<ParamsDictionary, any, 
 
 // [POST] /tweets
 export const detailTweetController = async (req: Request, res: Response, next: NextFunction) => {
+  const views = await tweetService.increaseView(req.params.tweet_id, req.decoded_authorization?.user_id)
+  const tweet = {
+    ...req.tweet,
+    guest_views : views.guest_views,
+    user_views: views.user_views
+  }
   res.json({
-    result: req.tweet
+    result: tweet
   })
 }
