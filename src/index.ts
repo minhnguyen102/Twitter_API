@@ -6,7 +6,7 @@ import { defaultErrorHandler } from './middlewares/errors.middleware'
 import { initFolder } from './utils/file'
 import {config} from 'dotenv'
 import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from './constants/dir'
-// import '~/utils/faker'
+import '~/utils/faker'
 
 
 config();
