@@ -179,6 +179,174 @@ class TweetService{
     })
     return {tweetDetailChildren, totalDocument}
   }
+
+  async getNewFeeds({user_id, limit, page} : {user_id: string, limit: number, page: number}){
+    const follower_users = await databaseService.followers.find({
+      user_id: new ObjectId(user_id)
+    }).toArray()
+    const follower_user_ids = follower_users.map(follower_user => follower_user.followed_user_id);
+    // Thêm cả id của tôi để hiển thị bài của tôi trên new feed
+    follower_user_ids.push(new ObjectId(user_id))
+    console.log("follower_user_ids and my id total: ", follower_user_ids.length)
+    const newFeeds = await databaseService.tweets.aggregate(
+      [
+        {
+          '$match': {
+            'user_id': {
+              '$in': follower_user_ids
+            }
+          }
+        }, {
+          '$lookup': {
+            'from': 'users', 
+            'localField': 'user_id', 
+            'foreignField': '_id', 
+            'as': 'user'
+          }
+        }, {
+          '$unwind': {
+            'path': '$user'
+          }
+        }, 
+        {
+          '$match': {
+            '$or': [
+              {
+                'audience': 0
+              }, {
+                '$and': [
+                  {
+                    'audience': 1
+                  }, {
+                    'user.tweeter_circle': {
+                      '$in': [
+                        new ObjectId(user_id) // trong audience: TweetCircle của người tôi follow phải có id của tôi
+                      ]
+                    }
+                  }
+                ]
+              }, 
+              {
+                'user_id': new ObjectId(user_id) // hoặc bài viết này phải là của tôi
+              }
+            ]
+          }
+        }, 
+        {
+          '$lookup': {
+            'from': 'hashtags', 
+            'localField': 'hashtags', 
+            'foreignField': '_id', 
+            'as': 'hashtags'
+          }
+        }, {
+          '$lookup': {
+            'from': 'mentions', 
+            'localField': 'mentions', 
+            'foreignField': '_id', 
+            'as': 'mentions'
+          }
+        }, {
+          '$addFields': {
+            'mentions': {
+              '$map': {
+                'input': '$mentions', 
+                'as': 'mention', 
+                'in': {
+                  '_id': '$$mention._id', 
+                  'name': '$$mention.name', 
+                  'username': '$$mention.username', 
+                  'email': '$$mention.email'
+                }
+              }
+            }
+          }
+        }, {
+          '$lookup': {
+            'from': 'tweets', 
+            'localField': '_id', 
+            'foreignField': 'parent_id', 
+            'as': 'tweet_children'
+          }
+        }, {
+          '$lookup': {
+            'from': 'bookmarks', 
+            'localField': '_id', 
+            'foreignField': 'tweet_id', 
+            'as': 'results'
+          }
+        }, {
+          '$addFields': {
+            'retweet_count': {
+              '$size': {
+                '$filter': {
+                  'input': '$tweet_children', 
+                  'as': 'item', 
+                  'cond': {
+                    '$eq': [
+                      '$$item.type', TweetType.Retweet
+                    ]
+                  }
+                }
+              }
+            }, 
+            'commnent_count': {
+              '$size': {
+                '$filter': {
+                  'input': '$tweet_children', 
+                  'as': 'item', 
+                  'cond': {
+                    '$eq': [
+                      '$$item.type', TweetType.Comment
+                    ]
+                  }
+                }
+              }
+            }, 
+            'quote_count': {
+              '$size': {
+                '$filter': {
+                  'input': '$tweet_children', 
+                  'as': 'item', 
+                  'cond': {
+                    '$eq': [
+                      '$$item.type', TweetType.QuoteTweet
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }, {
+          '$addFields': {
+            'views': {
+              '$add': [
+                '$user_views', '$guest_views'
+              ]
+            }
+          }
+        }, {
+          '$project': {
+            'results': 0, 
+            'tweet_children': 0, 
+            'user': {
+              'password': 0, 
+              'email_verify_token': 0, 
+              'forgot_password_token': 0, 
+              'tweeter_circle': 0, 
+              'date_od_birth': 0
+            }
+          }
+        }, 
+        {
+          '$skip': limit * (page - 1)
+        }, {
+          '$limit': limit
+        }
+      ]
+    ).toArray() // trả về 1 mảng new feeds
+    console.log(newFeeds.length)
+  }
 }
 
 const tweetService = new TweetService()

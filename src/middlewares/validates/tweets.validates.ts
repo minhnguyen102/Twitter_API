@@ -9,6 +9,7 @@ import { validate } from "~/utils/validation"
 const tweetsType = numberEnumToArray(TweetType)
 const tweetsAudience = numberEnumToArray(TweetAudience)
 const medias = numberEnumToArray(MediaType)
+
 export const validateCreateTweet = validate(
   checkSchema({
     type: {
@@ -104,7 +105,12 @@ export const validateGetTweetChildren = validate(
         options: [TweetType],
         errorMessage: TWEET_MESSAGE.INVALID_TYPE
       }
-    },
+    }
+  }, ['query'])
+)
+
+export const validatePaginaition = validate(
+  checkSchema({
     limit: {
       isNumeric: true,
       custom: {
@@ -128,6 +134,6 @@ export const validateGetTweetChildren = validate(
           return true
         }
       }
-    },
-  }, ['params', 'query'])
+    }
+  }, ['query'])
 )

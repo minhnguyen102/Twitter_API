@@ -14,7 +14,7 @@ import tweetService from "~/services/tweet.services"
 // Password for fake user
 const PASSWORD = "MinhNguyen102@twetter"
 // My ID, use for follow other user
-const MYID = new ObjectId("6847adee43d1cdc12e440f9d")
+const MYID = new ObjectId("684a39455d7515fbf90819d6")
 // Number of user created, each user created 2 tweet
 const NUMBER_USER = 100
  

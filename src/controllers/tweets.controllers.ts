@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import { ParamsDictionary } from "express-serve-static-core"
 import { TweetType } from "~/constants/enums"
-import { TweetParam, TweetQuery, TweetReqBody } from "~/models/requests/Tweet.requets"
+import { PaginationQuery, TweetParam, TweetQuery, TweetReqBody } from "~/models/requests/Tweet.requets"
 import { TokenPayload } from "~/models/requests/User.requests"
 import databaseService from "~/services/database.services"
 import tweetService from "~/services/tweet.services"
@@ -31,7 +31,7 @@ export const detailTweetController = async (req: Request, res: Response, next: N
   })
 }
 
-// [GET] /tweets/:tweet_id
+// [GET] /tweets/:tweet_id/children
 export const detailTweetChildrenController = async (req: Request<TweetParam, any, any, TweetQuery>, res: Response, next: NextFunction) => {
   const tweet_id = req.params.tweet_id // parent_id
   const type = Number(req.query.type) as TweetType
@@ -47,5 +47,16 @@ export const detailTweetChildrenController = async (req: Request<TweetParam, any
     limit,
     page, 
     totalPage: Math.ceil(totalDocument / limit)
+  })
+}
+
+// [GET] /tweets/
+export const newfeedsController = async (req: Request<ParamsDictionary, any, any, PaginationQuery>, res: Response, next: NextFunction) => {
+  const {user_id} = req.decoded_authorization as TokenPayload
+  const page = Number(req.query.page)
+  const limit = Number(req.query.limit)
+  await tweetService.getNewFeeds({user_id, page, limit})
+  res.json({
+    message: "Get new feed successfully"
   })
 }
