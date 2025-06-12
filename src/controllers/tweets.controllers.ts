@@ -55,8 +55,9 @@ export const newfeedsController = async (req: Request<ParamsDictionary, any, any
   const {user_id} = req.decoded_authorization as TokenPayload
   const page = Number(req.query.page)
   const limit = Number(req.query.limit)
-  await tweetService.getNewFeeds({user_id, page, limit})
+  const newFeeds = await tweetService.getNewFeeds({user_id, page, limit})
   res.json({
-    message: "Get new feed successfully"
+    message: "Get new feed successfully",
+    newFeeds
   })
 }

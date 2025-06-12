@@ -187,7 +187,7 @@ class TweetService{
     const follower_user_ids = follower_users.map(follower_user => follower_user.followed_user_id);
     // Thêm cả id của tôi để hiển thị bài của tôi trên new feed
     follower_user_ids.push(new ObjectId(user_id))
-    console.log("follower_user_ids and my id total: ", follower_user_ids.length)
+    // console.log("follower_user_ids and my id total: ", follower_user_ids.length)
     const newFeeds = await databaseService.tweets.aggregate(
       [
         {
@@ -231,6 +231,11 @@ class TweetService{
               }
             ]
           }
+        },
+        {
+          '$skip': limit * (page - 1)
+        }, {
+          '$limit': limit
         }, 
         {
           '$lookup': {
@@ -337,15 +342,11 @@ class TweetService{
               'date_od_birth': 0
             }
           }
-        }, 
-        {
-          '$skip': limit * (page - 1)
-        }, {
-          '$limit': limit
         }
       ]
     ).toArray() // trả về 1 mảng new feeds
-    console.log(newFeeds.length)
+    // console.log(newFeeds.length)
+    return newFeeds
   }
 }
 

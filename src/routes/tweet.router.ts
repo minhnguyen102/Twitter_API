@@ -46,11 +46,11 @@ tweetsRouter.get("/:tweet_id/children",
   wrapReqHandler(detailTweetChildrenController))
 
   /*
- * Description: Detail Tweets Children
+ * Description: Get tweet new feed
  * Path: /tweets/
  * Method: GET
  * Header: {Authorization : Bearer <access_token>}
- * Query: {skip : number, page: number, type: number}
+ * Query: {skip : number, page: number}
  */
 tweetsRouter.get("/", 
   validatePaginaition,
