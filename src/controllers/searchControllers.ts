@@ -10,7 +10,8 @@ export const searchControllers = async (req: Request<ParamsDictionary, any, any,
   const limit = Number(req.query.limit)
   const page = Number(req.query.page)
   const {user_id} = req.decoded_authorization as TokenPayload
-  const {tweets, totalDocument} = await searchService.search({content, limit, page, user_id})
+  const mediaType = req.query.mediaType
+  const {tweets, totalDocument} = await searchService.search({content, limit, page, user_id, mediaType})
   res.json({
     message: "Search Successfully",
     result: {
