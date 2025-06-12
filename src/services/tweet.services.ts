@@ -148,6 +148,7 @@ class TweetService{
         }
       ]
     ).toArray()
+    // pagination and increase views
     const tweet_children_ids = tweetDetailChildren.map(tweet => tweet._id)
     const inc = user_id? {user_views: 1} : {guest_views: 1}
     const date = new Date
@@ -188,7 +189,7 @@ class TweetService{
     // Thêm cả id của tôi để hiển thị bài của tôi trên new feed
     follower_user_ids.push(new ObjectId(user_id))
     // console.log("follower_user_ids and my id total: ", follower_user_ids.length)
-    const newFeeds = await databaseService.tweets.aggregate(
+    const [newFeeds, totalDocument] = await Promise.all([databaseService.tweets.aggregate(
       [
         {
           '$match': {
@@ -344,9 +345,74 @@ class TweetService{
           }
         }
       ]
-    ).toArray() // trả về 1 mảng new feeds
-    // console.log(newFeeds.length)
-    return newFeeds
+    ).toArray(), await databaseService.tweets.aggregate([
+        {
+          '$match': {
+            'user_id': {
+              '$in': follower_user_ids
+            }
+          }
+        }, {
+          '$lookup': {
+            'from': 'users', 
+            'localField': 'user_id', 
+            'foreignField': '_id', 
+            'as': 'user'
+          }
+        }, {
+          '$unwind': {
+            'path': '$user'
+          }
+        }, 
+        {
+          '$match': {
+            '$or': [
+              {
+                'audience': 0
+              }, {
+                '$and': [
+                  {
+                    'audience': 1
+                  }, {
+                    'user.tweeter_circle': {
+                      '$in': [
+                        new ObjectId(user_id) // trong audience: TweetCircle của người tôi follow phải có id của tôi
+                      ]
+                    }
+                  }
+                ]
+              }, 
+              {
+                'user_id': new ObjectId(user_id) // hoặc bài viết này phải là của tôi
+              }
+            ]
+          }
+        },{
+          '$count': "total"
+        }
+      ]).toArray()]) // trả về 1 mảng new feeds
+
+    // pagination and increase views
+    const newFeed_ids = newFeeds.map(newFeed => newFeed._id);
+    const date = new Date
+    await databaseService.tweets.updateMany(
+        {
+          _id: {
+            $in: newFeed_ids
+          }
+        }, {
+          $inc: {user_views: 1},
+          $set: {
+            updated_at: date
+          }
+        }
+      )
+    newFeeds.forEach(newFeeds => {
+      newFeeds.updated_at= date
+      newFeeds.user_views += 1 
+    })
+
+    return {newFeeds, totalDocument}
   }
 }
 
