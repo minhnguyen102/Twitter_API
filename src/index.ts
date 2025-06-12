@@ -18,6 +18,7 @@ databaseService.run().catch(console.dir).then(() => {
   databaseService.createIndexUser()
   databaseService.createIndexRefreshToken()
   databaseService.createIndexFollower()
+  databaseService.createIndexTweet()
 });
 app.use(express.json());
 app.use(router);

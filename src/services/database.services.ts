@@ -6,6 +6,7 @@ import Follower from '~/models/schemas/Follower.schema';
 import Tweet from '~/models/schemas/Tweet.schema';
 import Hashtag from '~/models/schemas/Hashtag.schema';
 import Bookmark from '~/models/schemas/Bookmark.schema';
+import { text } from 'stream/consumers';
 dotenv.config()
 
 const uri = `mongodb+srv://${process.env.USER_NAME}:${process.env.PASSWORD}@cluster0.sqjfe.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -50,6 +51,13 @@ class DatabaseService {
     const indexExit = await this.followers.indexExists(['user_id_1_followed_user_id_1'])
     if(!indexExit){
       this.followers.createIndex({user_id: 1, followed_user_id: 1})
+    }
+  }
+
+  async createIndexTweet(){
+    const indexExit = await this.tweets.indexExists(['content_text'])
+    if(!indexExit){
+      this.tweets.createIndex({content: 'text'}, {default_language: 'none'})
     }
   }
 
