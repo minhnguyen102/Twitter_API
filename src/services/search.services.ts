@@ -3,12 +3,13 @@ import databaseService from "./database.services"
 import { MediaType, MediaTypeQuery, TweetAudience, TweetType } from "~/constants/enums"
 
 class SearchService{
-  async search({content, limit, page, user_id, mediaType} : {content: string, limit: number, page: number, user_id: string, mediaType?: MediaTypeQuery}){
+  async search({content, limit, page, user_id, mediaType, peopleFollow} : {content: string, limit: number, page: number, user_id: string, mediaType?: MediaTypeQuery, peopleFollow: string}){
     const $match: any = {
       '$text': {
         '$search': content
       }
     }
+    // Query mediaType
     if(mediaType){
       if(mediaType === MediaTypeQuery.Image){
         $match['medias.type'] = MediaType.Image
@@ -18,8 +19,22 @@ class SearchService{
         }
       }
     }
+
+    // Query peopleFollow
+    if(peopleFollow && peopleFollow === 'true'){
+      const follower_users = await databaseService.followers.find({
+        user_id: new ObjectId(user_id)
+      }).toArray()
+      const follower_user_ids = follower_users.map(follower_user => follower_user.followed_user_id);
+      // Thêm cả id của tôi để hiển thị bài của tôi trên new feed
+      follower_user_ids.push(new ObjectId(user_id))
+      $match['user_id'] = {
+        '$in': follower_user_ids
+      }
+    }
+
     const [tweets, totalDocument] = await Promise.all([
-      databaseService.tweets.aggregate(
+    databaseService.tweets.aggregate(
       [
         {
           '$match': $match
@@ -160,7 +175,7 @@ class SearchService{
         }
       ]
     ).toArray(),
-    await databaseService.tweets.aggregate([
+    databaseService.tweets.aggregate([
         {
           '$match': $match
         }, {
@@ -202,10 +217,12 @@ class SearchService{
           '$count': "total"
         }
       ]).toArray()
-
     ]) 
     // console.log(totalDocument)
-    return {tweets, totalDocument}
+    return {
+      tweets, 
+      totalDocument: totalDocument[0]?.total || 0
+    }
   }
 }
 
