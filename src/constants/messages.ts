@@ -1,3 +1,5 @@
+import { MediaTypeQuery, PeopleFollowQuery } from "./enums"
+
 export const USER_MESSAGE = {
   UPLOAD_IMAGE_SUCCESSFULLY: 'Upload image successfully',
   UPLOAD_VIDEO_SUCCESSFULLY: "Upload video successfully",
@@ -103,4 +105,10 @@ export const BOOKMARK_MESSAGE = {
   UN_BOOKMARK_SUCCESSFULLY: "Unbookmark successfully",
   TWEET_ID_IN_VALID : "Tweet_id invalid",
   NOT_FOUND: "Not found"
+}
+
+export const SEARCH_MESSAGE = {
+  CONTENT_MUST_BE_STRING: "Content must be string",
+  MEIDA_TYPE: `Media type must be one of ${Object.values(MediaTypeQuery).join(", ")}`,
+  PEOPLE_FOLLOW: `peopleFollow type must be one of ${Object.values(PeopleFollowQuery).join(", ")}`
 }

@@ -3,7 +3,7 @@ import databaseService from "./database.services"
 import { MediaType, MediaTypeQuery, TweetAudience, TweetType } from "~/constants/enums"
 
 class SearchService{
-  async search({content, limit, page, user_id, mediaType, peopleFollow} : {content: string, limit: number, page: number, user_id: string, mediaType?: MediaTypeQuery, peopleFollow: string}){
+  async search({content, limit, page, user_id, mediaType, peopleFollow} : {content: string, limit: number, page: number, user_id: string, mediaType?: MediaTypeQuery, peopleFollow?: string}){
     const $match: any = {
       '$text': {
         '$search': content

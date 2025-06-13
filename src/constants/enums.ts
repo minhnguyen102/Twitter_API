@@ -32,3 +32,8 @@ export enum TweetAudience {
   Everyone, // Cho mọi người cùng xem
   TwiiterCircle // Chỉ định, có giới hạn
 }
+
+export enum PeopleFollowQuery{
+  Anyone = 'true',
+  Following = 'false'
+}
